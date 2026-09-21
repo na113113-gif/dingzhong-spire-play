@@ -25,7 +25,7 @@
             <label class="role-card selected">
               <input type="radio" name="role" value="c" checked>
               <span class="role-letter">C</span>
-              <span class="role-copy"><strong>C部 · 创新班学生</strong><small>灵感 · 课题 · 原型</small><em>初始牌组：快速作答 ×5　整理思路 ×5</em></span>
+              <span class="role-copy"><strong>C部 · 创新班学生</strong><small>思路 · 消耗 · 爆发</small><em>快速作答×4　整理思路×4　头脑风暴×1　竞赛神话×1</em></span>
               <span class="chosen">已选择</span>
             </label>
             <div class="role-card locked" aria-disabled="true">
@@ -53,8 +53,13 @@
         <h2>C部 · 创新班学生</h2>
         <div class="status-line"><span>专注</span><b>40 / 40</b></div>
         <div class="status-bar"><i></i></div>
-        <dl class="run-stats"><div><dt>当前阶段</dt><dd id="floorText">入口</dd></div><div><dt>已通过</dt><dd id="visitedText">0</dd></div></dl>
-        <div class="deck-note"><small>初始牌组</small><span>快速作答 ×5</span><span>整理思路 ×5</span></div>
+        <dl class="run-stats">
+          <div><dt>当前阶段</dt><dd id="floorText">入口</dd></div>
+          <div><dt>已通过</dt><dd id="visitedText">0</dd></div>
+          <div><dt>饭卡价值</dt><dd id="mealText">0</dd></div>
+          <div><dt>牌组</dt><dd id="deckCount">10</dd></div>
+        </dl>
+        <div class="deck-note"><small>初始牌组 · 10张</small><span>快速作答×4　整理思路×4</span><span>头脑风暴×1　竞赛神话×1</span></div>
       </aside>
       <section class="map-panel panel" aria-labelledby="mapTitle">
         <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1></div><button id="rerollMap" class="text-button" type="button">重新生成</button></div>
@@ -80,11 +85,91 @@
     </div>
   </main>
 
+  <main id="battleScreen" class="battle-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>上课 · 战斗节点</small></div></div>
+      <div class="route-title"><small>随堂小测</small><strong id="battleTurn">第1回合</strong></div>
+      <div class="battle-header-id">ID　<strong id="battlePlayerId"></strong></div>
+    </header>
+    <section class="battle-board">
+      <aside class="combatant-panel panel">
+        <span class="role-letter small">C</span>
+        <p class="eyebrow">C部 · 创新班学生</p>
+        <h2 id="battleRoleName">创新班学生</h2>
+        <div class="status-line"><span>专注</span><b id="battleHpText">40 / 40</b></div>
+        <div class="status-bar"><i id="battleHpBar"></i></div>
+        <div class="combat-values"><span>防御 <b id="battleBlock">0</b></span><span>思路增幅 <b id="nextAttackState">无</b></span></div>
+        <div id="powerList" class="power-list"><small>暂无天赋</small></div>
+      </aside>
+
+      <section class="enemy-zone">
+        <div class="intent-card" aria-live="polite">
+          <span>下一步意图</span>
+          <strong id="intentName">基础题</strong>
+          <p id="intentText">造成6点压力</p>
+        </div>
+        <article id="quizEnemy" class="quiz-enemy">
+          <p class="eyebrow">课堂挑战</p>
+          <h1>随堂小测</h1>
+          <p>“请独立作答，答题过程计入成绩。”</p>
+          <div class="enemy-statuses"><span id="enemyThought" hidden>思路 <b>0</b></span><span id="enemyBlock" hidden>防御 <b>0</b></span></div>
+          <div class="enemy-hp-row"><span>测验进度</span><div class="status-bar enemy"><i id="quizHpBar"></i></div><b id="quizHpText">52 / 52</b></div>
+        </article>
+        <div id="battleFloat" class="battle-float" aria-live="polite"></div>
+        <p id="battleLog" class="battle-log">试卷已经发下，先观察题型。</p>
+      </section>
+
+      <aside class="combat-rules panel">
+        <p class="eyebrow">战斗信息</p>
+        <h2>意图始终可见</h2>
+        <p>随堂小测以攻击为主。根据下一步意图安排攻击与防御。</p>
+        <dl>
+          <div><dt>抽牌堆</dt><dd id="battleDraw">10</dd></div>
+          <div><dt>弃牌堆</dt><dd id="battleDiscard">0</dd></div>
+          <div><dt>消耗牌堆</dt><dd id="battleExhaust">0</dd></div>
+        </dl>
+      </aside>
+    </section>
+    <section class="battle-desk">
+      <div class="energy-orb"><strong id="battleEnergy">3</strong><small>/ 3<br>行动力</small></div>
+      <div id="battleHand" class="battle-hand" aria-label="当前手牌"></div>
+      <button id="battleEndTurn" class="end-turn" type="button"><strong>结束回合</strong><span>执行敌方意图</span></button>
+    </section>
+  </main>
+
+  <main id="rewardScreen" class="reward-screen" hidden>
+    <section class="reward-panel panel">
+      <p class="eyebrow">上课节点完成</p>
+      <h1>选择1张卡牌</h1>
+      <p class="reward-copy">将选择的卡牌永久加入本次牌组。</p>
+      <div id="rewardCards" class="reward-cards"></div>
+      <div class="meal-reward"><span>本次获得饭卡价值</span><strong id="mealReward">0</strong></div>
+    </section>
+  </main>
+
   <div id="finishModal" class="modal" hidden>
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
       <p class="eyebrow">第一层路线完成</p><h2 id="finishTitle">抵达期末节点</h2>
       <p>Boss 内容尚未设计，本次地图演示到此结束。</p>
       <button id="restartMap" class="primary-button" type="button">生成新路线</button>
+    </section>
+  </div>
+
+  <div id="selectionModal" class="modal" hidden>
+    <section class="modal-card selection-card" role="dialog" aria-modal="true" aria-labelledby="selectionTitle">
+      <p class="eyebrow">卡牌选择</p>
+      <h2 id="selectionTitle">选择要消耗的牌</h2>
+      <p id="selectionHint"></p>
+      <div id="selectionCards" class="selection-cards"></div>
+      <div class="selection-actions"><button id="cancelSelection" class="text-button" type="button">取消</button><button id="confirmSelection" class="primary-button" type="button">确认</button></div>
+    </section>
+  </div>
+
+  <div id="defeatModal" class="modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="defeatTitle">
+      <p class="eyebrow">专注耗尽</p><h2 id="defeatTitle">需要重新作答</h2>
+      <p>调整打防顺序，再挑战随堂小测。</p>
+      <button id="retryBattle" class="primary-button" type="button">重新挑战</button>
     </section>
   </div>
   <script src="./app.js"></script>

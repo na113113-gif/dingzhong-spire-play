@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10251f">
+  <meta name="description" content="定州中学校园题材单关卡文字卡牌原型">
+  <title>定中尖塔：第一次随堂测验</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23112620'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='%23f5d06f' font-family='serif'%3E定%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="game-shell" aria-label="定中尖塔卡牌战斗">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">定</span>
+        <div><strong>定中尖塔</strong><span>原型 · 第一关</span></div>
+      </div>
+      <div class="stage-title"><span>高一 · 教学楼</span><strong>第一次随堂测验</strong></div>
+      <button class="text-button" id="restartTop" type="button">重新开始</button>
+    </header>
+
+    <section class="battlefield">
+      <aside class="side-panel player-panel" aria-label="玩家状态">
+        <div class="role-token">A</div>
+        <div><small>高一 · A部</small><h2>理科新生</h2></div>
+        <div class="stat-row"><span>专注</span><strong id="playerHpText">40 / 40</strong></div>
+        <div class="bar"><i id="playerHpBar"></i></div>
+        <div class="block-line" id="playerBlockLine"><span>防</span><b id="playerBlock">0</b> 思路</div>
+      </aside>
+
+      <section class="encounter" aria-label="战斗区域">
+        <div class="turn-label" id="turnLabel">第 1 回合</div>
+        <div class="enemy-card" id="enemyCard">
+          <p class="enemy-kicker">课堂挑战</p>
+          <h1>突击测验</h1>
+          <p class="enemy-quote" id="enemyQuote">“请独立作答，时间十五分钟。”</p>
+          <div class="intent" id="intent" aria-live="polite">
+            <span>下一步</span><strong id="intentText">基础题 · 造成 7 点压力</strong>
+          </div>
+          <div class="enemy-hp"><span>进度</span><div class="bar"><i id="enemyHpBar"></i></div><b id="enemyHpText">46 / 46</b></div>
+        </div>
+        <div class="float-text" id="floatText" aria-live="polite"></div>
+        <div class="combat-log" id="combatLog" aria-live="polite">铃声响起，试卷落在桌面上。</div>
+      </section>
+
+      <aside class="side-panel rules-panel" aria-label="关卡说明">
+        <p class="eyebrow">本关规则</p>
+        <h3>用答案击破测验</h3>
+        <p>每回合抽 5 张牌，获得 3 点行动力。防御只持续到对方行动结束。</p>
+        <dl><div><dt>抽牌堆</dt><dd id="drawCount">10</dd></div><div><dt>弃牌堆</dt><dd id="discardCount">0</dd></div></dl>
+      </aside>
+    </section>
+
+    <section class="desk" aria-label="手牌与回合控制">
+      <div class="energy" aria-label="当前行动力"><span id="energyNow">3</span><small>/ 3<br>行动力</small></div>
+      <div class="hand" id="hand" aria-label="当前手牌"></div>
+      <button class="end-turn" id="endTurn" type="button"><strong>结束回合</strong><span>让测验行动</span></button>
+    </section>
+    <footer>点击卡牌即可使用　·　攻击牌削减测验进度　·　防御牌抵消压力</footer>
+  </main>
+
+  <div class="modal" id="resultModal" hidden>
+    <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <p id="resultKicker">关卡完成</p>
+      <h2 id="resultTitle">下课铃响了</h2>
+      <p id="resultText">你完成了第一次随堂测验。</p>
+      <button id="restartModal" type="button">再试一次</button>
+    </div>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

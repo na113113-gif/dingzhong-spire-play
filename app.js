@@ -1,104 +1,139 @@
-const CARD_LIBRARY = {
-  answer: { id:"answer", name:"快速作答", type:"attack", label:"攻击", cost:1, value:6, text:"推进 <b>6</b> 点测验进度。" },
-  outline: { id:"outline", name:"整理思路", type:"defend", label:"防御", cost:1, value:5, text:"获得 <b>5</b> 点思路防御。" }
+const NODE_TYPES={
+  battle:{name:"上课",glyph:"课",detail:"战斗节点"},
+  rest:{name:"食堂",glyph:"食",detail:"篝火节点"},
+  event:{name:"超市",glyph:"超",detail:"随机节点"},
+  sport:{name:"操场",glyph:"体",detail:"体育节点"},
+  boss:{name:"期末",glyph:"期",detail:"本层 Boss"}
 };
-const enemyMoves = [
-  {name:"基础题", damage:7, quote:"“请独立作答，时间十五分钟。”"},
-  {name:"连续追问", damage:9, quote:"“写出过程，只有答案不计分。”"},
-  {name:"压轴题", damage:12, quote:"“最后一题，请合理安排时间。”"}
-];
-let state;
-const $ = id => document.getElementById(id);
+const ROWS=12,ROW_GAP=126,CANVAS_PAD=82;
+let run={nodes:[],edges:[],current:null,visited:new Set(),id:""};
+const $=id=>document.getElementById(id);
 
-function freshState(){
-  const deck = [...Array(5).fill("answer"), ...Array(5).fill("outline")];
-  return { playerHp:40, maxPlayerHp:40, block:0, enemyHp:46, maxEnemyHp:46, energy:3, turn:1, move:0, draw:shuffle(deck), discard:[], hand:[], over:false, locked:false };
+function randomType(row){
+  if(row===0)return "battle";
+  const n=Math.random();
+  if(n<.44)return "battle";
+  if(n<.64)return "rest";
+  if(n<.84)return "event";
+  return "sport";
 }
-function shuffle(cards){
-  const a=[...cards];
-  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
-  return a;
-}
-function drawCards(count){
-  for(let i=0;i<count;i++){
-    if(!state.draw.length){state.draw=shuffle(state.discard);state.discard=[]}
-    if(state.draw.length) state.hand.push(state.draw.pop());
+function createMap(){
+  const nodes=[],edges=[],byRow=[];
+  for(let row=0;row<ROWS;row++){
+    const count=row===0?3:(Math.random()<.48?3:4),rowNodes=[];
+    for(let i=0;i<count;i++){
+      const base=(i+1)/(count+1)*100;
+      const x=Math.max(12,Math.min(88,base+(Math.random()*8-4)));
+      const node={id:`${row}-${i}`,row,x,y:CANVAS_PAD+(ROWS-row)*ROW_GAP,type:randomType(row)};
+      nodes.push(node);rowNodes.push(node);
+    }
+    byRow.push(rowNodes);
   }
-}
-function startGame(){
-  state=freshState(); drawCards(5); $("resultModal").hidden=true; log("铃声响起，试卷落在桌面上。"); render();
-}
-function playCard(index){
-  if(state.over||state.locked) return;
-  const id=state.hand[index], card=CARD_LIBRARY[id];
-  if(!card||state.energy<card.cost) return;
-  state.energy-=card.cost;
-  state.hand.splice(index,1); state.discard.push(id);
-  if(card.type==="attack"){
-    state.enemyHp=Math.max(0,state.enemyHp-card.value);
-    animateHit(`-${card.value}`); log(`你使用“${card.name}”，测验进度推进 ${card.value} 点。`);
-  } else {
-    state.block+=card.value; animateFloat(`防 +${card.value}`); log(`你使用“${card.name}”，理清了 ${card.value} 点思路。`);
+  const boss={id:"boss",row:ROWS,x:50,y:CANVAS_PAD,type:"boss"};
+  nodes.push(boss);byRow.push([boss]);
+  for(let row=0;row<ROWS;row++){
+    const from=byRow[row],to=byRow[row+1];
+    from.forEach(node=>{
+      const ordered=[...to].sort((a,b)=>Math.abs(a.x-node.x)-Math.abs(b.x-node.x));
+      addEdge(edges,node,ordered[0]);
+      if(to.length>1&&Math.random()<.48)addEdge(edges,node,ordered[1]);
+    });
+    to.forEach(target=>{
+      if(!edges.some(edge=>edge.to===target.id)){
+        const nearest=[...from].sort((a,b)=>Math.abs(a.x-target.x)-Math.abs(b.x-target.x))[0];
+        addEdge(edges,nearest,target);
+      }
+    });
   }
-  if(state.enemyHp<=0){finish(true);return}
-  render();
+  run.nodes=nodes;run.edges=edges;run.current=null;run.visited=new Set();
+  renderMap();
+  $("floorText").textContent="入口";$("visitedText").textContent="0";
+  $("routeStatus").textContent="从教学楼入口出发";
+  $("mapTip").textContent="选择底部任一亮起的节点开始。进入节点后，只能沿连线继续向上。";
+  requestAnimationFrame(()=>{$("mapViewport").scrollTop=$("mapViewport").scrollHeight});
 }
-function endTurn(){
-  if(state.over||state.locked) return;
-  state.locked=true; render();
-  const move=enemyMoves[state.move];
-  const absorbed=Math.min(state.block,move.damage), taken=move.damage-absorbed;
-  state.playerHp=Math.max(0,state.playerHp-taken);
-  animateFloat(taken?`压力 -${taken}`:`完全防住`);
-  log(absorbed ? `“${move.name}”造成 ${move.damage} 点压力，思路抵消 ${absorbed} 点。` : `“${move.name}”造成 ${move.damage} 点压力。`);
-  state.block=0;
-  render();
-  setTimeout(()=>{
-    if(state.playerHp<=0){finish(false);return}
-    state.discard.push(...state.hand); state.hand=[];
-    state.turn++; state.move=(state.move+1)%enemyMoves.length; state.energy=3; drawCards(5); state.locked=false;
-    log(`第 ${state.turn} 回合：重新组织答案。`); render();
-  },520);
+function addEdge(edges,a,b){
+  if(!edges.some(edge=>edge.from===a.id&&edge.to===b.id))edges.push({from:a.id,to:b.id});
 }
-function finish(won){
-  state.over=true; state.locked=true; render();
-  $("resultKicker").textContent=won?"关卡完成":"专注耗尽";
-  $("resultTitle").textContent=won?"下课铃响了":"需要重新作答";
-  $("resultText").textContent=won?`你用 ${state.turn} 回合完成了第一次随堂测验。`:"这次压力超过了承受范围，调整攻防节奏再试一次。";
-  setTimeout(()=>{$("resultModal").hidden=false;$("restartModal").focus()},450);
+function nodeState(node){
+  if(run.current===node.id)return "current";
+  if(run.visited.has(node.id))return "visited";
+  if(!run.current&&node.row===0)return "available";
+  if(run.current&&run.edges.some(edge=>edge.from===run.current&&edge.to===node.id))return "available";
+  return "locked";
 }
-function render(){
-  $("playerHpText").textContent=`${state.playerHp} / ${state.maxPlayerHp}`;
-  $("playerHpBar").style.width=`${100*state.playerHp/state.maxPlayerHp}%`;
-  $("playerBlock").textContent=state.block; $("playerBlockLine").classList.toggle("active",state.block>0);
-  $("enemyHpText").textContent=`${state.enemyHp} / ${state.maxEnemyHp}`;
-  $("enemyHpBar").style.width=`${100*state.enemyHp/state.maxEnemyHp}%`;
-  $("energyNow").textContent=state.energy; $("turnLabel").textContent=`第 ${state.turn} 回合`;
-  const move=enemyMoves[state.move];
-  $("intentText").textContent=`${move.name} · 造成 ${move.damage} 点压力`;
-  $("enemyQuote").textContent=move.quote;
-  $("drawCount").textContent=state.draw.length; $("discardCount").textContent=state.discard.length;
-  $("endTurn").disabled=state.locked;
-  const hand=$("hand"); hand.innerHTML="";
-  state.hand.forEach((id,index)=>{
-    const card=CARD_LIBRARY[id], button=document.createElement("button");
-    button.type="button"; button.className=`game-card ${card.type}`; button.disabled=state.locked||state.energy<card.cost;
-    button.setAttribute("aria-label",`${card.name}，消耗${card.cost}点行动力`);
-    button.innerHTML=`<span class="cost">${card.cost}</span><p class="type">${card.label}</p><h3>${card.name}</h3><p>${card.text}</p>`;
-    button.addEventListener("click",()=>playCard(index)); hand.appendChild(button);
+function renderMap(){
+  const height=CANVAS_PAD*2+ROWS*ROW_GAP;
+  $("mapCanvas").style.height=`${height}px`;
+  const lookup=Object.fromEntries(run.nodes.map(node=>[node.id,node]));
+  const svg=$("routeLines");
+  svg.setAttribute("viewBox",`0 0 1000 ${height}`);
+  svg.innerHTML="";
+  run.edges.forEach(edge=>{
+    const a=lookup[edge.from],b=lookup[edge.to];
+    const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",a.x*10);line.setAttribute("y1",a.y);
+    line.setAttribute("x2",b.x*10);line.setAttribute("y2",b.y);
+    line.setAttribute("class",`route-line ${run.visited.has(edge.from)&&run.visited.has(edge.to)?"visited":""}`);
+    svg.appendChild(line);
+  });
+  const holder=$("mapNodes");holder.innerHTML="";
+  run.nodes.forEach(node=>{
+    const type=NODE_TYPES[node.type],state=nodeState(node),button=document.createElement("button");
+    button.type="button";button.className=`map-node ${node.type} ${state}`;
+    button.style.left=`${node.x}%`;button.style.top=`${node.y}px`;
+    button.disabled=state!=="available";
+    button.setAttribute("aria-label",`${type.name}，${type.detail}${state==="available"?"，可以进入":""}`);
+    button.innerHTML=`<span class="glyph">${type.glyph}</span><small>${type.name}</small>`;
+    button.addEventListener("click",()=>chooseNode(node));
+    holder.appendChild(button);
   });
 }
-function log(text){$("combatLog").textContent=text}
-function animateFloat(text){const el=$("floatText");el.textContent=text;el.classList.remove("show");void el.offsetWidth;el.classList.add("show")}
-function animateHit(text){$("enemyCard").classList.remove("hit");void $("enemyCard").offsetWidth;$("enemyCard").classList.add("hit");animateFloat(text)}
+function chooseNode(node){
+  if(nodeState(node)!=="available")return;
+  if(run.current)run.visited.add(run.current);
+  run.current=node.id;run.visited.add(node.id);
+  $("visitedText").textContent=run.visited.size;
+  $("floorText").textContent=node.type==="boss"?"期末":`第 ${node.row+1} 阶段`;
+  $("routeStatus").textContent=`当前位置：${NODE_TYPES[node.type].name}`;
+  $("mapTip").textContent=`已进入${NODE_TYPES[node.type].name}。节点内容暂未开放，请沿亮起的连线继续。`;
+  renderMap();
+  if(node.type==="boss")setTimeout(()=>{$("finishModal").hidden=false},260);
+}
+function enterGame(id){
+  run.id=id;$("displayId").textContent=id;
+  $("startScreen").hidden=true;$("mapScreen").hidden=false;
+  createMap();
+}
+function backToStart(){
+  $("mapScreen").hidden=true;$("startScreen").hidden=false;
+  $("finishModal").hidden=true;$("playerId").focus();
+}
 
-$("endTurn").addEventListener("click",endTurn);
-$("restartTop").addEventListener("click",startGame);
-$("restartModal").addEventListener("click",startGame);
-document.addEventListener("keydown",e=>{if(e.key.toLowerCase()==="e")endTurn()});
+$("startForm").addEventListener("submit",event=>{
+  event.preventDefault();
+  const id=$("playerId").value.trim();
+  if(!id){$("formError").textContent="请输入学生 ID 后开始游戏";$("playerId").focus();return}
+  $("formError").textContent="";enterGame(id);
+});
+$("playerId").addEventListener("input",()=>{$("formError").textContent=""});
+$("newRun").addEventListener("click",backToStart);
+$("rerollMap").addEventListener("click",createMap);
+$("restartMap").addEventListener("click",()=>{$("finishModal").hidden=true;createMap()});
 
 if(document.modelContext?.registerTool){
-  const tool={name:"restart_classroom_battle",title:"重新开始战斗",description:"重置当前单关卡卡牌战斗并回到第一回合。",inputSchema:{type:"object",properties:{},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute(){startGame();return {status:"restarted",turn:state.turn}}};
-  try{Promise.resolve(document.modelContext.registerTool(tool)).catch(()=>{})}catch{}
+  try{
+    Promise.resolve(document.modelContext.registerTool({
+      name:"generate_new_school_route",
+      title:"生成新路线",
+      description:"为当前高一第一层重新生成一张随机校园路线地图。",
+      inputSchema:{type:"object",properties:{},additionalProperties:false},
+      annotations:{readOnlyHint:false,untrustedContentHint:false},
+      execute(){
+        if($("mapScreen").hidden)throw new Error("尚未开始游戏");
+        createMap();
+        return {status:"generated",nodes:run.nodes.length,paths:run.edges.length};
+      }
+    })).catch(()=>{});
+  }catch{}
 }
-startGame();

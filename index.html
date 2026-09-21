@@ -4,69 +4,88 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#10251f">
-  <meta name="description" content="定州中学校园题材单关卡文字卡牌原型">
-  <title>定中尖塔：第一次随堂测验</title>
+  <meta name="description" content="定州中学校园题材文字卡牌游戏地图原型">
+  <title>定中尖塔</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23112620'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='%23f5d06f' font-family='serif'%3E定%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <main class="game-shell" aria-label="定中尖塔卡牌战斗">
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true">定</span>
-        <div><strong>定中尖塔</strong><span>原型 · 第一关</span></div>
-      </div>
-      <div class="stage-title"><span>高一 · 教学楼</span><strong>第一次随堂测验</strong></div>
-      <button class="text-button" id="restartTop" type="button">重新开始</button>
-    </header>
-
-    <section class="battlefield">
-      <aside class="side-panel player-panel" aria-label="玩家状态">
-        <div class="role-token">A</div>
-        <div><small>高一 · A部</small><h2>理科新生</h2></div>
-        <div class="stat-row"><span>专注</span><strong id="playerHpText">40 / 40</strong></div>
-        <div class="bar"><i id="playerHpBar"></i></div>
-        <div class="block-line" id="playerBlockLine"><span>防</span><b id="playerBlock">0</b> 思路</div>
-      </aside>
-
-      <section class="encounter" aria-label="战斗区域">
-        <div class="turn-label" id="turnLabel">第 1 回合</div>
-        <div class="enemy-card" id="enemyCard">
-          <p class="enemy-kicker">课堂挑战</p>
-          <h1>突击测验</h1>
-          <p class="enemy-quote" id="enemyQuote">“请独立作答，时间十五分钟。”</p>
-          <div class="intent" id="intent" aria-live="polite">
-            <span>下一步</span><strong id="intentText">基础题 · 造成 7 点压力</strong>
+  <main id="startScreen" class="start-screen">
+    <section class="start-card" aria-labelledby="gameTitle">
+      <div class="seal" aria-hidden="true">定</div>
+      <p class="eyebrow">校园牌组构筑游戏</p>
+      <h1 id="gameTitle">定中尖塔</h1>
+      <p class="chapter">第一层 · 高一</p>
+      <form id="startForm" novalidate>
+        <label class="id-field" for="playerId"><span>学生 ID</span><input id="playerId" name="playerId" maxlength="16" autocomplete="off" placeholder="输入你的 ID" aria-describedby="idHint"></label>
+        <p id="idHint" class="field-hint">ID 仅用于本次游戏显示</p>
+        <fieldset>
+          <legend>选择角色</legend>
+          <div class="role-grid">
+            <label class="role-card selected">
+              <input type="radio" name="role" value="c" checked>
+              <span class="role-letter">C</span>
+              <span class="role-copy"><strong>C部 · 创新班学生</strong><small>灵感 · 课题 · 原型</small><em>初始牌组：快速作答 ×5　整理思路 ×5</em></span>
+              <span class="chosen">已选择</span>
+            </label>
+            <div class="role-card locked" aria-disabled="true">
+              <span class="role-letter">?</span>
+              <span class="role-copy"><strong>待定角色</strong><small>尚未开放</small><em>角色体系等待设计</em></span>
+              <span class="chosen">待定</span>
+            </div>
           </div>
-          <div class="enemy-hp"><span>进度</span><div class="bar"><i id="enemyHpBar"></i></div><b id="enemyHpText">46 / 46</b></div>
-        </div>
-        <div class="float-text" id="floatText" aria-live="polite"></div>
-        <div class="combat-log" id="combatLog" aria-live="polite">铃声响起，试卷落在桌面上。</div>
-      </section>
-
-      <aside class="side-panel rules-panel" aria-label="关卡说明">
-        <p class="eyebrow">本关规则</p>
-        <h3>用答案击破测验</h3>
-        <p>每回合抽 5 张牌，获得 3 点行动力。防御只持续到对方行动结束。</p>
-        <dl><div><dt>抽牌堆</dt><dd id="drawCount">10</dd></div><div><dt>弃牌堆</dt><dd id="discardCount">0</dd></div></dl>
-      </aside>
+        </fieldset>
+        <p class="form-error" id="formError" aria-live="polite"></p>
+        <button class="primary-button" type="submit">开始游戏</button>
+      </form>
     </section>
-
-    <section class="desk" aria-label="手牌与回合控制">
-      <div class="energy" aria-label="当前行动力"><span id="energyNow">3</span><small>/ 3<br>行动力</small></div>
-      <div class="hand" id="hand" aria-label="当前手牌"></div>
-      <button class="end-turn" id="endTurn" type="button"><strong>结束回合</strong><span>让测验行动</span></button>
-    </section>
-    <footer>点击卡牌即可使用　·　攻击牌削减测验进度　·　防御牌抵消压力</footer>
   </main>
 
-  <div class="modal" id="resultModal" hidden>
-    <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
-      <p id="resultKicker">关卡完成</p>
-      <h2 id="resultTitle">下课铃响了</h2>
-      <p id="resultText">你完成了第一次随堂测验。</p>
-      <button id="restartModal" type="button">再试一次</button>
+  <main id="mapScreen" class="map-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>第一层 · 高一</small></div></div>
+      <div class="route-title"><small>路线规划</small><strong id="routeStatus">从教学楼入口出发</strong></div>
+      <button id="newRun" class="text-button" type="button">返回选角</button>
+    </header>
+    <div class="map-layout">
+      <aside class="profile-panel panel">
+        <div class="profile-head"><span class="role-letter small">C</span><div><small>玩家 ID</small><strong id="displayId"></strong></div></div>
+        <h2>C部 · 创新班学生</h2>
+        <div class="status-line"><span>专注</span><b>40 / 40</b></div>
+        <div class="status-bar"><i></i></div>
+        <dl class="run-stats"><div><dt>当前阶段</dt><dd id="floorText">入口</dd></div><div><dt>已通过</dt><dd id="visitedText">0</dd></div></dl>
+        <div class="deck-note"><small>初始牌组</small><span>快速作答 ×5</span><span>整理思路 ×5</span></div>
+      </aside>
+      <section class="map-panel panel" aria-labelledby="mapTitle">
+        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1></div><button id="rerollMap" class="text-button" type="button">重新生成</button></div>
+        <div id="mapViewport" class="map-viewport">
+          <div id="mapCanvas" class="map-canvas" aria-label="随机生成的一层路线地图">
+            <svg id="routeLines" class="route-lines" aria-hidden="true"></svg>
+            <div id="mapNodes"></div>
+          </div>
+        </div>
+        <p class="map-tip" id="mapTip">选择底部任一亮起的节点开始。进入节点后，只能沿连线继续向上。</p>
+      </section>
+      <aside class="legend-panel panel">
+        <p class="eyebrow">节点类型</p><h2>高一校园</h2>
+        <ul class="legend-list">
+          <li><span class="node-sample battle">课</span><div><strong>上课</strong><small>战斗节点</small></div></li>
+          <li><span class="node-sample rest">食</span><div><strong>食堂</strong><small>篝火节点</small></div></li>
+          <li><span class="node-sample event">超</span><div><strong>超市</strong><small>随机节点</small></div></li>
+          <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
+          <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
+        </ul>
+        <div class="placeholder-note"><strong>当前版本</strong><p>仅展示地图生成与路线选择。各节点具体内容将在后续设计。</p></div>
+      </aside>
     </div>
+  </main>
+
+  <div id="finishModal" class="modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
+      <p class="eyebrow">第一层路线完成</p><h2 id="finishTitle">抵达期末节点</h2>
+      <p>Boss 内容尚未设计，本次地图演示到此结束。</p>
+      <button id="restartMap" class="primary-button" type="button">生成新路线</button>
+    </section>
   </div>
   <script src="./app.js"></script>
 </body>

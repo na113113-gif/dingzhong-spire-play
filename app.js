@@ -1,7 +1,26 @@
 const NODE_TYPES={
-  battle:{name:"上课",glyph:"课",detail:"战斗节点"},rest:{name:"食堂",glyph:"食",detail:"篝火节点"},
+  battle:{name:"上课",glyph:"课",detail:"战斗节点"},dorm:{name:"宿舍",glyph:"舍",detail:"休整节点"},
+  canteen:{name:"食堂",glyph:"食",detail:"采购节点"},
   event:{name:"超市",glyph:"超",detail:"随机节点"},sport:{name:"操场",glyph:"体",detail:"体育节点"},
   boss:{name:"期末",glyph:"期",detail:"本层 Boss"}
+};
+const UPGRADES={
+  quick:"造成9点伤害。",brainstorm:"造成10点伤害，给予3层思路。",continuous:"造成4点伤害4次。",research:"造成12点伤害。",
+  solve:"造成10点伤害。若目标拥有思路，获得5点防御。",catch_gap:"造成9点伤害。若目标已有思路，给予2层思路；否则给予1层。",
+  rebuild:"造成7点伤害。可以消耗1张其他手牌，若如此做，额外造成10点伤害。",combo:"造成5点伤害3次。本场每消耗4张牌，额外攻击1次，最多额外攻击2次。",
+  showcase:"造成18点伤害。消耗牌堆每有1张牌，额外造成2点伤害，最多24点。",ultimate:"造成30点伤害，给予3层思路。",
+  conjecture:"移除目标全部思路。造成15点伤害，每移除1层额外造成7点伤害，最多计算3层。",
+  organize:"获得8点防御。",myth:"失去2点生命。下一张攻击牌造成的伤害翻倍。费用变为0。",
+  tradeoff:"消耗1张其他手牌，获得8点防御。",backup:"获得11点防御。若因拖延被消耗，获得7点防御。",
+  seminar:"给予所有敌人3层思路。",review:"将弃牌堆中1张攻击牌放入手牌，其本回合费用减少1。费用变为0。",
+  recycle_draft:"消耗1张其他手牌，抽3张牌。",restart:"消耗任意数量其他手牌，再抽取等量牌，然后额外抽1张牌。费用变为0。",
+  overtime:"失去2点生命，获得2点行动力。",emergency:"获得18点防御。选择弃牌堆中最多2张牌消耗。",
+  negation:"将消耗牌堆中1张任意牌放入手牌。其本回合费用变为0并获得消耗。",
+  defense:"每回合前2次使用攻击牌攻击拥有思路的敌人时，抽1张牌。",inertia:"每回合开始时，给予所有敌人2层思路。",
+  waste_value:"每回合首次消耗卡牌时，获得7点防御。",contest_body:"每当卡牌使你失去生命，下一张攻击牌额外造成6点伤害。",
+  deadline:"每回合首张因拖延被消耗的牌，使你在下回合获得1点行动力并多抽1张牌。",
+  recycle_power:"每当消耗1张牌，对所有敌人造成4点伤害。",thought_loop:"敌人的思路层数减少时，对其造成8点伤害。",
+  prototype:"每回合首次消耗攻击牌时，将其0费消耗的升级复制品加入手牌。"
 };
 const TYPE_LABEL={attack:"攻击",skill:"技能",power:"天赋"};
 const RARITY_LABEL={basic:"基础",common:"普通",uncommon:"罕见",rare:"稀有"};
@@ -47,19 +66,21 @@ const ENEMY_INTENTS=[
 ];
 const ROWS=12,ROW_GAP=126,CANVAS_PAD=82;
 let uid=0;
-let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:40,maxHp:40,meal:0,pendingNode:null};
-let battle=null,selection=null,pendingReward=null;
+let deckUid=0;
+let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:40,maxHp:40,meal:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
+let battle=null,selection=null,pendingReward=null,deckAction=null;
 const $=id=>document.getElementById(id);
-const makeCard=id=>({id,uid:++uid,tempCost:null,forcedExhaust:false});
+const makeDeckEntry=id=>({id,upgraded:false,deckUid:++deckUid});
+const makeCard=source=>{const entry=typeof source==="string"?{id:source,upgraded:false}:source;return{id:entry.id,upgraded:!!entry.upgraded,deckUid:entry.deckUid,uid:++uid,tempCost:null,forcedExhaust:false}};
 const shuffle=list=>{const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
 function showOnly(id){
-  ["startScreen","mapScreen","battleScreen","rewardScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
+  ["startScreen","mapScreen","battleScreen","rewardScreen","dormScreen","canteenScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
 }
 function randomType(row){
   if(row===0)return "battle";
   const n=Math.random();
-  if(n<.44)return "battle";if(n<.64)return "rest";if(n<.84)return "event";return "sport";
+  if(n<.4)return "battle";if(n<.55)return "dorm";if(n<.7)return "canteen";if(n<.85)return "event";return "sport";
 }
 function createMap(){
   const nodes=[],edges=[],byRow=[];
@@ -125,21 +146,96 @@ function chooseNode(node){
   $("routeStatus").textContent="当前位置："+NODE_TYPES[node.type].name;
   renderMap();updateRunHud();
   if(node.type==="battle"){setTimeout(startBattle,180);return}
+  if(node.type==="dorm"){setTimeout(openDorm,180);return}
+  if(node.type==="canteen"){setTimeout(openCanteen,180);return}
   $("mapTip").textContent="已进入"+NODE_TYPES[node.type].name+"。节点内容暂未开放，请沿亮起的连线继续。";
   if(node.type==="boss")setTimeout(()=>{$("finishModal").hidden=false},260);
 }
 function updateRunHud(){
   $("visitedText").textContent=run.visited.size;$("mealText").textContent=run.meal;$("deckCount").textContent=run.deck.length;
+  const hpText=document.querySelector(".profile-panel .status-line b"),hpBar=document.querySelector(".profile-panel .status-bar i");
+  if(hpText)hpText.textContent=run.hp+" / "+run.maxHp;if(hpBar)hpBar.style.width=(run.hp/run.maxHp*100)+"%";
 }
 function enterGame(id){
-  run.id=id;run.deck=[...STARTER_DECK];run.hp=40;run.maxHp=40;run.meal=0;
-  $("displayId").textContent=id;$("battlePlayerId").textContent=id;showOnly("mapScreen");createMap();
+  run.id=id;run.deck=STARTER_DECK.map(makeDeckEntry);run.hp=40;run.maxHp=40;run.meal=0;run.dormVisits=0;run.bingeCount=0;run.shop=null;
+  $("displayId").textContent=id;$("battlePlayerId").textContent=id;$("dormPlayerId").textContent=id;showOnly("mapScreen");createMap();
 }
 function backToStart(){showOnly("startScreen");$("finishModal").hidden=true;$("playerId").focus()}
 
+function finishNode(message){
+  updateRunHud();showOnly("mapScreen");renderMap();$("mapTip").textContent=message+" 请选择下一节点。";
+}
+function openDorm(){
+  const isNoon=run.dormVisits%2===0,name=isNoon?"午休":"晚休",percent=isNoon?25:35,heal=Math.ceil(run.maxHp*percent/100);
+  $("restCycleTitle").textContent=name;$("restCycleLabel").textContent=name;$("restPercent").textContent=percent+"%";
+  $("restPreview").textContent="预计恢复 "+Math.min(heal,run.maxHp-run.hp)+" 点专注";
+  $("chooseRest").textContent="开始"+name;$("chooseUpgrade").disabled=!run.deck.some(card=>!card.upgraded);
+  $("dormStatus").textContent="当前专注 "+run.hp+" / "+run.maxHp+"，本次为"+name+"。";showOnly("dormScreen");
+}
+function restAtDorm(){
+  const isNoon=run.dormVisits%2===0,name=isNoon?"午休":"晚休",amount=Math.ceil(run.maxHp*(isNoon?.25:.35)),before=run.hp;
+  run.hp=Math.min(run.maxHp,run.hp+amount);run.dormVisits++;
+  finishNode(name+"结束，恢复了 "+(run.hp-before)+" 点专注。");
+}
+function openDeckAction(mode){
+  deckAction={mode,returnTo:mode==="upgrade"?"dorm":"canteen"};
+  $("deckActionTitle").textContent=mode==="upgrade"?"挑灯修读":"暴食";
+  $("deckActionHint").textContent=mode==="upgrade"?"选择1张尚未升级的卡牌。":"选择1张卡牌永久移出本次牌组。";
+  const entries=mode==="upgrade"?run.deck.filter(card=>!card.upgraded):run.deck,holder=$("deckActionCards");holder.innerHTML="";
+  if(!entries.length){holder.innerHTML='<p class="deck-empty">没有可以选择的卡牌。</p>'}
+  entries.forEach(entry=>{const card=createCardElement(makeCard(entry),false);card.disabled=false;card.addEventListener("click",()=>completeDeckAction(entry.deckUid));holder.appendChild(card)});
+  $("deckActionModal").hidden=false;
+}
+function completeDeckAction(targetUid){
+  if(!deckAction)return;
+  if(deckAction.mode==="upgrade"){
+    const entry=run.deck.find(card=>card.deckUid===targetUid);if(!entry)return;entry.upgraded=true;run.dormVisits++;$("deckActionModal").hidden=true;deckAction=null;
+    finishNode("“"+CARDS[entry.id].name+"”已升级为“"+CARDS[entry.id].name+"+”。");return;
+  }
+  const price=150+run.bingeCount*75;if(run.meal<price)return;
+  const entry=run.deck.find(card=>card.deckUid===targetUid);if(!entry)return;
+  run.meal-=price;run.deck=run.deck.filter(card=>card.deckUid!==targetUid);run.bingeCount++;$("deckActionModal").hidden=true;deckAction=null;renderShop();
+}
+function cancelDeckAction(){$("deckActionModal").hidden=true;deckAction=null}
+function priceFor(rarity,extra){
+  const ranges={common:[90,110],uncommon:[170,190],rare:[290,310]},range=ranges[rarity];
+  return range[0]+Math.floor(Math.random()*(range[1]-range[0]+1))+(extra||0);
+}
+function generateShop(){
+  const cards=[];
+  while(cards.length<5){
+    const rarity=rollRarity(),pool=Object.keys(CARDS).filter(id=>CARDS[id].rarity===rarity&&!cards.some(item=>item.id===id));
+    const id=pool[Math.floor(Math.random()*pool.length)];if(id)cards.push({id,rarity,price:priceFor(rarity),sold:false});
+  }
+  const colorless=Array.from({length:2},(_,index)=>{const rarity=rollRarity();return{name:"无色卡位 "+(index+1),rarity,price:priceFor(rarity,50)}});
+  run.shop={cards,colorless,relics:Array.from({length:3},(_,index)=>({name:"圣遗物槽位 "+(index+1),price:500+Math.floor(Math.random()*101)})),foods:Array.from({length:3},(_,index)=>({name:"食物槽位 "+(index+1)}))};
+}
+function openCanteen(){generateShop();showOnly("canteenScreen");renderShop()}
+function renderShop(){
+  $("shopMeal").textContent=run.meal;
+  const cardHolder=$("classShopCards");cardHolder.innerHTML="";
+  run.shop.cards.forEach(item=>{
+    const def=CARDS[item.id],box=document.createElement("article");box.className="shop-item"+(item.sold?" sold":"");
+    box.innerHTML='<span class="rarity-tag">'+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
+    const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>buyClassCard(item));cardHolder.appendChild(box);
+  });
+  renderPlaceholderGoods("colorlessShopCards",run.shop.colorless,item=>RARITY_LABEL[item.rarity]+" · 无色卡",true);
+  renderPlaceholderGoods("relicShopItems",run.shop.relics,()=>"圣遗物",true);
+  renderPlaceholderGoods("foodShopItems",run.shop.foods,()=>"食物",false);
+  const price=150+run.bingeCount*75;$("bingePrice").textContent=price;$("bingeButton").disabled=run.meal<price||run.deck.length===0;
+  updateRunHud();
+}
+function renderPlaceholderGoods(holderId,items,label,priced){
+  const holder=$(holderId);holder.innerHTML="";
+  items.forEach(item=>{const box=document.createElement("article");box.className="shop-item colorless placeholder";box.innerHTML='<small>'+label(item)+'</small><h3>'+item.name+'</h3><p>效果等待后续设计，本演示暂不可购买。</p><div class="shop-bottom"><span class="shop-price">'+(priced?item.price:"价格待定")+'</span><button class="shop-buy" type="button" disabled>待设计</button></div>';holder.appendChild(box)});
+}
+function buyClassCard(item){
+  if(item.sold||run.meal<item.price)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop();
+}
+
 function startBattle(){
   battle={
-    turn:1,energy:3,nextEnergy:0,block:0,playerHp:run.hp,enemyHp:52,maxEnemyHp:52,enemyBlock:0,enemyThought:0,
+    turn:1,energy:3,nextEnergy:0,nextDraw:0,block:0,playerHp:run.hp,enemyHp:52,maxEnemyHp:52,enemyBlock:0,enemyThought:0,
     draw:shuffle(run.deck.map(makeCard)),discard:[],exhaust:[],hand:[],powers:{},doubleNext:false,nextAttackBonus:0,
     exhaustedCount:0,locked:false,over:false,exhaustTriggered:false,delayTriggered:false,prototypeTriggered:false,thoughtAttackTriggers:0
   };
@@ -150,7 +246,7 @@ function startPlayerTurn(first){
   battle.energy=3+battle.nextEnergy;battle.nextEnergy=0;battle.exhaustTriggered=false;battle.delayTriggered=false;
   battle.prototypeTriggered=false;battle.thoughtAttackTriggers=0;
   if(battle.powers.inertia)battle.enemyThought+=battle.powers.inertia;
-  drawCards(5);renderBattle();
+  drawCards(5+battle.nextDraw);battle.nextDraw=0;renderBattle();
 }
 function drawCards(count){
   for(let i=0;i<count;i++){
@@ -158,22 +254,23 @@ function drawCards(count){
     battle.hand.push(battle.draw.pop());
   }
 }
-function getCost(inst){return inst.tempCost==null?CARDS[inst.id].cost:inst.tempCost}
-function selectionConfig(id){
+function getCost(inst){const upgradedCost=inst.upgraded&&["myth","review","restart"].includes(inst.id)?0:CARDS[inst.id].cost;return inst.tempCost==null?upgradedCost:inst.tempCost}
+function selectionConfig(card){
+  const id=typeof card==="string"?card:card.id,isUpgraded=typeof card==="object"&&card.upgraded;
   if(id==="rebuild")return {zone:"hand",min:0,max:1,title:"选择1张手牌作为废案",hint:"也可以不消耗，直接造成基础伤害。"};
   if(id==="tradeoff")return {zone:"hand",min:1,max:1,title:"选择1张手牌消耗",hint:"消耗后获得5点防御。"};
   if(id==="recycle_draft")return {zone:"hand",min:1,max:1,title:"选择1张手牌回收",hint:"消耗后抽2张牌。"};
   if(id==="restart")return {zone:"hand",min:0,max:99,title:"选择要推倒的手牌",hint:"重新抽取等量牌，并额外抽1张。"};
   if(id==="review")return {zone:"discard",min:1,max:1,filter:inst=>CARDS[inst.id].type==="attack",title:"选择1张攻击牌复盘",hint:"将其放入手牌，本回合费用减少1。"};
   if(id==="emergency")return {zone:"discard",min:0,max:2,title:"选择最多2张弃牌消耗",hint:"不选择也可以获得14点防御。"};
-  if(id==="negation")return {zone:"exhaust",min:1,max:1,filter:inst=>CARDS[inst.id].type==="attack",title:"选择1张已消耗的攻击牌",hint:"将其0费放入手牌，并再次获得消耗。"};
+  if(id==="negation")return {zone:"exhaust",min:1,max:1,filter:inst=>isUpgraded||CARDS[inst.id].type==="attack",title:isUpgraded?"选择1张已消耗的牌":"选择1张已消耗的攻击牌",hint:"将其0费放入手牌，并再次获得消耗。"};
   return null;
 }
 function cardPlayable(inst){
   if(battle.locked||battle.over||battle.energy<getCost(inst))return false;
   if(inst.id==="myth"&&battle.playerHp<=2)return false;
   if(inst.id==="overtime"&&battle.playerHp<=3)return false;
-  const config=selectionConfig(inst.id);
+  const config=selectionConfig(inst);
   if(config&&config.min>0){
     const zone=battle[config.zone],candidates=zone.filter(other=>other.uid!==inst.uid&&(!config.filter||config.filter(other)));
     if(candidates.length<config.min)return false;
@@ -182,7 +279,7 @@ function cardPlayable(inst){
 }
 function prepareCardPlay(uidValue){
   const inst=battle.hand.find(card=>card.uid===uidValue);if(!inst||!cardPlayable(inst))return;
-  const config=selectionConfig(inst.id);
+  const config=selectionConfig(inst);
   if(config){openSelection(inst,config);return}
   resolveCardPlay(inst,[]);
 }
@@ -218,29 +315,29 @@ function resolveCardPlay(inst,selected){
   battle.energy-=cost;battle.hand=battle.hand.filter(card=>card.uid!==inst.uid);
   let selectedUsed=false;
   switch(inst.id){
-    case"quick":dealAttack(6);break;
-    case"brainstorm":dealAttack(8);battle.enemyThought+=2;break;
-    case"continuous":dealAttack(3,4);break;
-    case"research":dealAttack(9);break;
-    case"solve":{const active=battle.enemyThought>0;dealAttack(7);if(active)gainBlock(4);break}
-    case"catch_gap":{const active=battle.enemyThought>0;dealAttack(6);battle.enemyThought+=active?2:1;break}
-    case"rebuild":if(selected.length){exhaustSelected(selected,"hand");selectedUsed=true;dealAttack(13)}else dealAttack(5);break;
-    case"combo":dealAttack(4,3+Math.min(2,Math.floor(battle.exhaustedCount/4)));break;
-    case"showcase":dealAttack(14+Math.min(20,battle.exhaust.length*2));break;
-    case"ultimate":dealAttack(24);battle.enemyThought+=3;break;
-    case"conjecture":{const layers=Math.min(3,battle.enemyThought);battle.enemyThought=0;dealAttack(12+layers*6);break}
-    case"organize":gainBlock(5);break;
+    case"quick":dealAttack(inst.upgraded?9:6);break;
+    case"brainstorm":dealAttack(inst.upgraded?10:8);battle.enemyThought+=inst.upgraded?3:2;break;
+    case"continuous":dealAttack(inst.upgraded?4:3,4);break;
+    case"research":dealAttack(inst.upgraded?12:9);break;
+    case"solve":{const active=battle.enemyThought>0;dealAttack(inst.upgraded?10:7);if(active)gainBlock(inst.upgraded?5:4);break}
+    case"catch_gap":{const active=battle.enemyThought>0;dealAttack(inst.upgraded?9:6);battle.enemyThought+=active?2:1;break}
+    case"rebuild":if(selected.length){exhaustSelected(selected,"hand");selectedUsed=true;dealAttack(inst.upgraded?17:13)}else dealAttack(inst.upgraded?7:5);break;
+    case"combo":dealAttack(inst.upgraded?5:4,3+Math.min(2,Math.floor(battle.exhaustedCount/4)));break;
+    case"showcase":dealAttack((inst.upgraded?18:14)+Math.min(inst.upgraded?24:20,battle.exhaust.length*2));break;
+    case"ultimate":dealAttack(inst.upgraded?30:24);battle.enemyThought+=3;break;
+    case"conjecture":{const layers=Math.min(3,battle.enemyThought);battle.enemyThought=0;dealAttack((inst.upgraded?15:12)+layers*(inst.upgraded?7:6));break}
+    case"organize":gainBlock(inst.upgraded?8:5);break;
     case"myth":loseHp(2,true);battle.doubleNext=true;break;
-    case"tradeoff":exhaustSelected(selected,"hand");selectedUsed=true;gainBlock(5);break;
-    case"backup":gainBlock(8);break;
-    case"seminar":battle.enemyThought+=2;break;
+    case"tradeoff":exhaustSelected(selected,"hand");selectedUsed=true;gainBlock(inst.upgraded?8:5);break;
+    case"backup":gainBlock(inst.upgraded?11:8);break;
+    case"seminar":battle.enemyThought+=inst.upgraded?3:2;break;
     case"review":returnFromDiscard(selected[0]);selectedUsed=true;break;
-    case"recycle_draft":exhaustSelected(selected,"hand");selectedUsed=true;drawCards(2);break;
+    case"recycle_draft":exhaustSelected(selected,"hand");selectedUsed=true;drawCards(inst.upgraded?3:2);break;
     case"restart":{const count=selected.length;exhaustSelected(selected,"hand");selectedUsed=true;drawCards(count+1);break}
-    case"overtime":loseHp(3,true);battle.energy+=2;break;
-    case"emergency":exhaustSelected(selected,"discard");selectedUsed=true;gainBlock(14);break;
+    case"overtime":loseHp(inst.upgraded?2:3,true);battle.energy+=2;break;
+    case"emergency":exhaustSelected(selected,"discard");selectedUsed=true;gainBlock(inst.upgraded?18:14);break;
     case"negation":returnFromExhaust(selected[0]);selectedUsed=true;break;
-    default:applyPower(inst.id);
+    default:applyPower(inst.id,inst.upgraded);
   }
   if(def.type==="power"){}
   else if(def.exhaust||inst.forcedExhaust)exhaustCard(inst,{played:true});
@@ -280,19 +377,19 @@ function dealAttack(base,hits){
   battle.doubleNext=false;battle.nextAttackBonus=0;animateEnemy("-"+total);
   if(thought&&battle.powers.defense&&battle.thoughtAttackTriggers<battle.powers.defense){battle.thoughtAttackTriggers++;drawCards(1)}
 }
-function applyPower(id){
-  const values={defense:1,inertia:1,waste_value:5,contest_body:4,deadline:1,recycle_power:3,thought_loop:6,prototype:1};
-  battle.powers[id]=(battle.powers[id]||0)+values[id];
+function applyPower(id,upgraded){
+  const values={defense:upgraded?2:1,inertia:upgraded?2:1,waste_value:upgraded?7:5,contest_body:upgraded?6:4,deadline:1,recycle_power:upgraded?4:3,thought_loop:upgraded?8:6,prototype:1};
+  battle.powers[id]=(battle.powers[id]||0)+values[id];if(id==="deadline"&&upgraded)battle.powers.deadline_draw=(battle.powers.deadline_draw||0)+1;if(id==="prototype"&&upgraded)battle.powers.prototype_upgraded=1;
 }
 function exhaustCard(inst,context){
   inst.tempCost=null;inst.forcedExhaust=false;battle.exhaust.push(inst);battle.exhaustedCount++;
   if(!battle.exhaustTriggered&&battle.powers.waste_value){battle.exhaustTriggered=true;gainBlock(battle.powers.waste_value)}
   if(battle.powers.recycle_power)dealEffectDamage(battle.powers.recycle_power);
-  if(context.delay&&!battle.delayTriggered&&battle.powers.deadline){battle.delayTriggered=true;battle.nextEnergy+=battle.powers.deadline}
-  if(context.delay&&inst.id==="backup")gainBlock(5);
+  if(context.delay&&!battle.delayTriggered&&battle.powers.deadline){battle.delayTriggered=true;battle.nextEnergy+=battle.powers.deadline;battle.nextDraw+=battle.powers.deadline_draw||0}
+  if(context.delay&&inst.id==="backup")gainBlock(inst.upgraded?7:5);
   if(CARDS[inst.id].type==="attack"&&!battle.prototypeTriggered&&battle.powers.prototype){
     battle.prototypeTriggered=true;
-    for(let i=0;i<battle.powers.prototype;i++){const copy=makeCard(inst.id);copy.tempCost=0;copy.forcedExhaust=true;battle.hand.push(copy)}
+    for(let i=0;i<battle.powers.prototype;i++){const copy=makeCard({id:inst.id,upgraded:!!battle.powers.prototype_upgraded});copy.tempCost=0;copy.forcedExhaust=true;battle.hand.push(copy)}
   }
 }
 function dealEffectDamage(amount){
@@ -351,9 +448,9 @@ function renderHand(){
 }
 function createCardElement(inst,reward){
   const def=CARDS[inst.id],button=document.createElement("button");button.type="button";
-  button.className="battle-card "+def.type+(reward?" reward-card":"");
+  button.className="battle-card class-card "+def.type+(reward?" reward-card":"")+(inst.upgraded?" upgraded":"");
   const rarity='<span class="rarity-'+def.rarity+'">'+RARITY_LABEL[def.rarity]+"</span>";
-  button.innerHTML='<span class="card-cost">'+(reward?def.cost:getCost(inst))+'</span><p class="card-meta">'+TYPE_LABEL[def.type]+" · "+rarity+"</p><h3>"+def.name+'</h3><p class="card-text">'+def.text+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
+  button.innerHTML='<span class="card-cost">'+(reward?def.cost:getCost(inst))+'</span><p class="card-meta">'+TYPE_LABEL[def.type]+" · "+rarity+"</p><h3>"+def.name+(inst.upgraded?"+":"")+'</h3><p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
   return button;
 }
 function battleLog(text){$("battleLog").textContent=text}
@@ -388,7 +485,7 @@ function showRewards(){
   showOnly("rewardScreen");
 }
 function selectReward(id){
-  run.deck.push(id);pendingReward=null;updateRunHud();showOnly("mapScreen");renderMap();
+  run.deck.push(makeDeckEntry(id));pendingReward=null;updateRunHud();showOnly("mapScreen");renderMap();
   $("mapTip").textContent="已将“"+CARDS[id].name+"”加入牌组，并获得饭卡价值。请选择下一节点。";
 }
 
@@ -399,6 +496,11 @@ $("restartMap").addEventListener("click",()=>{$("finishModal").hidden=true;creat
 $("battleEndTurn").addEventListener("click",endPlayerTurn);
 $("cancelSelection").addEventListener("click",cancelSelection);$("confirmSelection").addEventListener("click",confirmSelection);
 $("retryBattle").addEventListener("click",()=>{$("defeatModal").hidden=true;run.hp=run.maxHp;startBattle()});
+$("chooseRest").addEventListener("click",restAtDorm);
+$("chooseUpgrade").addEventListener("click",()=>openDeckAction("upgrade"));
+$("cancelDeckAction").addEventListener("click",cancelDeckAction);
+$("leaveCanteen").addEventListener("click",()=>finishNode("已离开食堂。"));
+$("bingeButton").addEventListener("click",()=>openDeckAction("remove"));
 
 if(document.modelContext?.registerTool){
   try{Promise.resolve(document.modelContext.registerTool({

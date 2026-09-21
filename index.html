@@ -75,14 +75,54 @@
         <p class="eyebrow">节点类型</p><h2>高一校园</h2>
         <ul class="legend-list">
           <li><span class="node-sample battle">课</span><div><strong>上课</strong><small>战斗节点</small></div></li>
-          <li><span class="node-sample rest">食</span><div><strong>食堂</strong><small>篝火节点</small></div></li>
+          <li><span class="node-sample dorm">舍</span><div><strong>宿舍</strong><small>休整节点</small></div></li>
+          <li><span class="node-sample canteen">食</span><div><strong>食堂</strong><small>采购节点</small></div></li>
           <li><span class="node-sample event">超</span><div><strong>超市</strong><small>随机节点</small></div></li>
           <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
           <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
         </ul>
-        <div class="placeholder-note"><strong>当前版本</strong><p>仅展示地图生成与路线选择。各节点具体内容将在后续设计。</p></div>
+        <div class="placeholder-note"><strong>当前版本</strong><p>上课、宿舍与食堂节点可交互。超市、操场与期末内容等待设计。</p></div>
       </aside>
     </div>
+  </main>
+
+  <main id="dormScreen" class="node-screen dorm-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>宿舍 · 休整节点</small></div></div>
+      <div class="route-title"><small>熄灯之前</small><strong id="restCycleTitle">午休</strong></div>
+      <div class="battle-header-id">ID　<strong id="dormPlayerId"></strong></div>
+    </header>
+    <section class="node-stage">
+      <div class="node-intro"><p class="eyebrow">宿舍节点</p><h1>在下一节课前做出选择</h1><p id="dormStatus">安静的宿舍里，时间只够完成1件事。</p></div>
+      <div class="choice-grid">
+        <article class="choice-card rest-choice">
+          <span class="choice-mark">休</span><p class="eyebrow" id="restCycleLabel">午休</p><h2>休息</h2>
+          <p>恢复专注上限的 <strong id="restPercent">25%</strong>。</p><small id="restPreview">预计恢复 10 点专注</small>
+          <button id="chooseRest" class="primary-button" type="button">开始午休</button>
+        </article>
+        <article class="choice-card study-choice">
+          <span class="choice-mark">修</span><p class="eyebrow">挑灯修读</p><h2>升级1张卡牌</h2>
+          <p>从当前牌组选择1张尚未升级的卡牌，强化至本次游戏结束。</p><small>已升级的卡牌会显示“+”</small>
+          <button id="chooseUpgrade" class="primary-button" type="button">选择卡牌</button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <main id="canteenScreen" class="node-screen canteen-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>食堂 · 采购节点</small></div></div>
+      <div class="route-title"><small>今日余额</small><strong>饭卡价值 <span id="shopMeal">0</span></strong></div>
+      <button id="leaveCanteen" class="text-button" type="button">离开食堂</button>
+    </header>
+    <section class="shop-stage">
+      <div class="shop-heading"><div><p class="eyebrow">食堂货架</p><h1>C部专属货架</h1></div><p><span class="color-key c">C部绿色</span><span class="color-key a">A部红色</span><span class="color-key b">B部蓝色</span><span class="color-key n">无色</span></p></div>
+      <section class="shop-section"><div class="section-title"><h2>角色卡牌</h2><small>5张 · 普通 7 / 罕见 2 / 稀有 1</small></div><div id="classShopCards" class="shop-grid card-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>无色卡牌</h2><small>2张 · 内容待设计，价格预览</small></div><div id="colorlessShopCards" class="shop-grid compact-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>圣遗物</h2><small>3件 · 内容待设计</small></div><div id="relicShopItems" class="shop-grid compact-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>食物</h2><small>3种 · 内容与价格待设计</small></div><div id="foodShopItems" class="shop-grid compact-goods"></div></section>
+      <section class="binge-panel panel"><div><p class="eyebrow">暴食</p><h2>从牌组移除1张卡牌</h2><p>本次价格 <strong id="bingePrice">150</strong>，每次暴食后价格 +75。</p></div><button id="bingeButton" class="primary-button" type="button">选择要移除的牌</button></section>
+    </section>
   </main>
 
   <main id="battleScreen" class="battle-screen" hidden>
@@ -162,6 +202,16 @@
       <p id="selectionHint"></p>
       <div id="selectionCards" class="selection-cards"></div>
       <div class="selection-actions"><button id="cancelSelection" class="text-button" type="button">取消</button><button id="confirmSelection" class="primary-button" type="button">确认</button></div>
+    </section>
+  </div>
+
+  <div id="deckActionModal" class="modal" hidden>
+    <section class="modal-card selection-card" role="dialog" aria-modal="true" aria-labelledby="deckActionTitle">
+      <p class="eyebrow">牌组管理</p>
+      <h2 id="deckActionTitle">选择1张卡牌</h2>
+      <p id="deckActionHint"></p>
+      <div id="deckActionCards" class="selection-cards"></div>
+      <div class="selection-actions"><button id="cancelDeckAction" class="text-button" type="button">取消</button></div>
     </section>
   </div>
 

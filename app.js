@@ -266,7 +266,7 @@ function openEvent(){
 }
 function openSport(){showOnly("sportScreen")}
 function chooseSport(type){
-  if(type==="run"){run.maxHp+=10;finishNode("完成跑步训练，最大专注增加 10。");return}
+  if(type==="run"){run.maxHp+=5;finishNode("完成跑步训练，最大专注增加 5。");return}
   if(type==="basketball"){run.strength++;finishNode("完成篮球训练，获得 1 点力量。");return}
   run.dexterity++;finishNode("完成羽毛球训练，获得 1 点敏捷。");
 }

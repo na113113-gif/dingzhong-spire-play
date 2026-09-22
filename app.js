@@ -68,7 +68,7 @@ const ROWS=12,ROW_GAP=126,CANVAS_PAD=82;
 let uid=0;
 let deckUid=0;
 let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:40,maxHp:40,meal:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
-let battle=null,selection=null,pendingReward=null,deckAction=null;
+let battle=null,selection=null,pendingReward=null,deckAction=null,upgradePreview=false;
 const $=id=>document.getElementById(id);
 const makeDeckEntry=id=>({id,upgraded:false,deckUid:++deckUid});
 const makeCard=source=>{const entry=typeof source==="string"?{id:source,upgraded:false}:source;return{id:entry.id,upgraded:!!entry.upgraded,deckUid:entry.deckUid,uid:++uid,tempCost:null,forcedExhaust:false}};
@@ -161,6 +161,30 @@ function enterGame(id){
   $("displayId").textContent=id;$("battlePlayerId").textContent=id;$("dormPlayerId").textContent=id;showOnly("mapScreen");createMap();
 }
 function backToStart(){showOnly("startScreen");$("finishModal").hidden=true;$("playerId").focus()}
+
+function updateRealTime(){
+  const now=new Date(),pad=value=>String(value).padStart(2,"0");
+  $("realTime").textContent=pad(now.getHours())+":"+pad(now.getMinutes())+":"+pad(now.getSeconds());
+  $("realDate").textContent=now.getFullYear()+"年"+pad(now.getMonth()+1)+"月"+pad(now.getDate())+"日";
+}
+function openDeckView(){
+  upgradePreview=false;$("toggleUpgradePreview").setAttribute("aria-pressed","false");
+  $("toggleUpgradePreview").textContent="显示升级后效果";renderDeckView();$("deckViewModal").hidden=false;
+}
+function renderDeckView(){
+  $("deckViewCount").textContent=run.deck.length;
+  $("deckViewHint").textContent=upgradePreview?"正在预览所有卡牌的升级后效果，不改变实际牌组。":"显示当前实际效果，已升级卡牌带有“+”。";
+  const holder=$("deckViewCards");holder.innerHTML="";
+  run.deck.forEach(entry=>{
+    const preview=upgradePreview&&!entry.upgraded,inst=makeCard({...entry,upgraded:entry.upgraded||upgradePreview}),card=createCardElement(inst,false);
+    if(preview){card.classList.add("previewing");const label=document.createElement("span");label.className="preview-label";label.textContent="升级预览";card.querySelector(".card-text").appendChild(label)}
+    card.disabled=false;holder.appendChild(card);
+  });
+}
+function toggleUpgradePreview(){
+  upgradePreview=!upgradePreview;$("toggleUpgradePreview").setAttribute("aria-pressed",String(upgradePreview));
+  $("toggleUpgradePreview").textContent=upgradePreview?"显示当前效果":"显示升级后效果";renderDeckView();
+}
 
 function finishNode(message){
   updateRunHud();showOnly("mapScreen");renderMap();$("mapTip").textContent=message+" 请选择下一节点。";
@@ -501,6 +525,10 @@ $("chooseUpgrade").addEventListener("click",()=>openDeckAction("upgrade"));
 $("cancelDeckAction").addEventListener("click",cancelDeckAction);
 $("leaveCanteen").addEventListener("click",()=>finishNode("已离开食堂。"));
 $("bingeButton").addEventListener("click",()=>openDeckAction("remove"));
+$("inspectDeck").addEventListener("click",openDeckView);
+$("closeDeckView").addEventListener("click",()=>{$("deckViewModal").hidden=true});
+$("toggleUpgradePreview").addEventListener("click",toggleUpgradePreview);
+updateRealTime();setInterval(updateRealTime,1000);
 
 if(document.modelContext?.registerTool){
   try{Promise.resolve(document.modelContext.registerTool({

@@ -1,3 +1,464 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10251f">
+  <meta name="description" content="定州中学校园题材文字卡牌游戏地图原型">
+  <title>定中尖塔 v0.0.2 · 单文件版</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23112620'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='%23f5d06f' font-family='serif'%3E定%3C/text%3E%3C/svg%3E">
+  <style>
+:root{--ink:#edf5ef;--muted:#9cb0a7;--deep:#07130f;--green:#10251f;--line:#315046;--gold:#f1cb66;--shadow:0 22px 60px #0007}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--deep);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}button,input{font:inherit}button{color:inherit}.start-screen,.map-screen,.node-screen{min-height:100vh;background:radial-gradient(circle at 50% 25%,#214b3d 0,#10251f 42%,#07130f 100%);position:relative}.start-screen:before,.map-screen:before,.node-screen:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.045;background:repeating-linear-gradient(90deg,transparent 0 63px,#fff 64px),repeating-linear-gradient(0deg,transparent 0 63px,#fff 64px)}
+.start-screen{display:grid;place-items:center;padding:34px 18px}.start-card{width:min(830px,100%);border:1px solid #557166;background:#0a1c17e8;border-radius:18px;padding:clamp(28px,5vw,54px);box-shadow:var(--shadow);position:relative}.seal{width:62px;height:62px;margin:0 auto 15px;display:grid;place-items:center;border:1px solid var(--gold);border-radius:50%;font:700 34px serif;color:var(--gold)}.eyebrow{margin:0;color:var(--gold);font-size:12px;letter-spacing:.18em}.start-card>.eyebrow,.start-card>h1,.chapter{text-align:center}.start-card>h1{font:700 clamp(38px,7vw,66px) serif;letter-spacing:.12em;margin:7px 0 3px}.chapter{color:var(--muted);margin:0 0 30px;letter-spacing:.12em}
+.id-field{display:grid;grid-template-columns:100px 1fr;align-items:center;border:1px solid var(--line);border-radius:9px;background:#07130f;padding:0 15px}.id-field span{color:#c6d4cd;font-size:14px}.id-field input{width:100%;border:0;border-left:1px solid var(--line);background:transparent;color:#fff;padding:14px 16px;outline:none;font-size:16px}.id-field:focus-within{border-color:var(--gold)}.id-field input::placeholder{color:#61766d}.field-hint{margin:7px 0 24px 116px;color:#768c82;font-size:12px}fieldset{margin:0;padding:0;border:0}legend{font-size:14px;color:#cbd8d2;margin-bottom:10px}.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.role-card{position:relative;display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:13px;min-height:112px;padding:17px;border:1px solid var(--line);border-radius:11px;background:#112920;cursor:pointer}.role-card input{position:absolute;opacity:0}.role-card.selected{border-color:var(--gold);box-shadow:inset 0 0 0 1px #f1cb6633;background:#173329}.role-card.locked{opacity:.42;cursor:not-allowed}.role-letter{display:grid;place-items:center;width:52px;height:52px;border-radius:9px;background:var(--gold);color:#17231f;font:800 27px serif}.role-copy{display:grid;gap:5px}.role-copy strong{font-family:serif;font-size:18px}.role-copy small{color:var(--gold)}.role-copy em{font-style:normal;color:var(--muted);font-size:12px}.chosen{align-self:start;font-size:11px;color:var(--gold);border:1px solid #f1cb6644;border-radius:99px;padding:4px 8px}.form-error{height:20px;margin:10px 0 3px;text-align:center;color:#e48b80;font-size:13px}.primary-button{display:block;width:100%;border:0;border-radius:9px;background:var(--gold);color:#16231d;padding:14px 22px;font-weight:800;cursor:pointer}.primary-button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.topbar{height:74px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 clamp(16px,3vw,46px);border-bottom:1px solid #ffffff18;background:#071611dd;backdrop-filter:blur(9px);position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:11px}.brand-mark{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--gold);border-radius:50%;color:var(--gold);font:700 23px serif}.brand div{display:grid}.brand strong{font:700 17px serif;letter-spacing:.1em}.brand small{color:var(--muted);margin-top:3px}.route-title{text-align:center;display:grid;gap:2px}.route-title small{color:var(--gold);font-size:11px;letter-spacing:.16em}.route-title strong{font:700 17px serif}.text-button{justify-self:end;background:transparent;border:1px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer}.text-button:hover{border-color:var(--gold);color:var(--gold)}
+.map-layout{display:grid;grid-template-columns:230px minmax(420px,760px) 230px;gap:18px;justify-content:center;align-items:start;padding:22px clamp(14px,3vw,42px) 30px;position:relative}.panel{border:1px solid var(--line);background:#0a1b16d9;border-radius:13px;box-shadow:var(--shadow)}.profile-panel,.legend-panel{padding:20px;position:sticky;top:96px}.profile-head{display:flex;align-items:center;gap:10px}.role-letter.small{width:42px;height:42px;font-size:22px}.profile-head div{display:grid}.profile-head small{color:var(--muted);font-size:11px}.profile-head strong{margin-top:2px;overflow-wrap:anywhere}.profile-panel h2,.legend-panel h2{font:700 20px serif;margin:18px 0}.status-line{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.status-bar{height:7px;border-radius:99px;background:#0008;overflow:hidden}.status-bar i{display:block;width:100%;height:100%;background:#65ad87}.run-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0}.run-stats div{border:1px solid var(--line);border-radius:7px;padding:10px}.run-stats dt{font-size:11px;color:var(--muted)}.run-stats dd{margin:4px 0 0;color:var(--gold);font:700 18px serif}.deck-note{display:grid;gap:5px;border-top:1px solid var(--line);padding-top:15px;font-size:13px}.deck-note small{color:var(--muted);margin-bottom:3px}
+.map-panel{overflow:hidden}.map-heading{min-height:88px;display:flex;align-items:center;justify-content:space-between;padding:17px 22px;border-bottom:1px solid var(--line);background:#0d211b}.map-heading h1{font:700 25px serif;margin:5px 0 0}.map-viewport{height:calc(100vh - 230px);min-height:540px;overflow:auto;background:linear-gradient(#102c24aa,#071511ee);scrollbar-color:#49685b #07130f}.map-canvas{position:relative;width:100%;min-width:390px}.route-lines{position:absolute;inset:0;width:100%;height:100%;z-index:0}.route-line{stroke:#416156;stroke-width:2.2;stroke-dasharray:5 7;vector-effect:non-scaling-stroke}.route-line.visited{stroke:var(--gold);stroke-dasharray:none;stroke-width:3}
+.map-node{position:absolute;z-index:2;transform:translate(-50%,-50%);display:grid;place-items:center;width:56px;height:56px;border-radius:50%;border:2px solid #577267;background:#102920;color:#c9d8d1;cursor:not-allowed;box-shadow:0 8px 20px #0008;transition:.18s}.map-node .glyph{font:800 17px serif}.map-node small{position:absolute;top:60px;width:82px;text-align:center;color:#8fa49b;font-size:11px}.map-node.available{cursor:pointer;border-color:var(--gold);color:#fff;background:#1b4034;box-shadow:0 0 0 5px #f1cb6611,0 0 24px #f1cb6644}.map-node.available:hover,.map-node.available:focus-visible{transform:translate(-50%,-50%) scale(1.1);outline:0}.map-node.current{border-color:#fff;background:var(--gold);color:#14221c}.map-node.visited{border-color:#806f43;background:#243027;color:#a9976d}.map-node.battle.available{background:#4b2925}.map-node.dorm.available{background:#274c3d}.map-node.canteen.available{background:#724a20}.map-node.event.available{background:#493957}.map-node.sport.available{background:#25465b}.map-node.boss{width:66px;height:66px;border-radius:12px;transform:translate(-50%,-50%) rotate(45deg);border-color:#a86459;background:#41221e}.map-node.boss .glyph{transform:rotate(-45deg);font-size:19px}.map-node.boss small{transform:rotate(-45deg);top:70px;left:25px}.map-node.boss.available{border-color:var(--gold);background:#66322b}.map-tip{margin:0;padding:13px 20px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;text-align:center;background:#091914}
+.legend-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}.legend-list li{display:flex;align-items:center;gap:10px}.node-sample{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1px solid #759083;font:700 13px serif}.node-sample.battle{background:#4b2925}.node-sample.dorm{background:#274c3d}.node-sample.canteen{background:#724a20}.node-sample.event{background:#493957}.node-sample.sport{background:#25465b}.node-sample.boss{border-radius:8px;background:#66322b}.legend-list div{display:grid}.legend-list strong{font-size:14px}.legend-list small{color:var(--muted);font-size:11px;margin-top:2px}.placeholder-note{margin-top:22px;padding:13px;border:1px solid #f1cb6638;border-radius:8px;background:#f1cb6608}.placeholder-note strong{color:var(--gold);font-size:13px}.placeholder-note p{color:var(--muted);font-size:12px;line-height:1.6;margin:6px 0 0}
+.modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#030c09df;backdrop-filter:blur(7px)}.modal[hidden],[hidden]{display:none!important}.modal-card{width:min(410px,calc(100% - 32px));text-align:center;padding:35px;border:1px solid var(--gold);border-radius:14px;background:#112820;box-shadow:var(--shadow)}.modal-card h2{font:700 30px serif;margin:10px}.modal-card>p:not(.eyebrow){color:var(--muted);line-height:1.6}.modal-card .primary-button{margin-top:20px}
+.battle-screen,.reward-screen{min-height:100vh;background:radial-gradient(circle at 50% 25%,#214b3d 0,#10251f 42%,#07130f 100%);position:relative}.battle-screen:before,.reward-screen:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.045;background:repeating-linear-gradient(90deg,transparent 0 63px,#fff 64px),repeating-linear-gradient(0deg,transparent 0 63px,#fff 64px)}
+.battle-header-id{justify-self:end;color:var(--muted);font-size:13px}.battle-header-id strong{color:var(--ink)}.battle-board{min-height:480px;display:grid;grid-template-columns:230px minmax(390px,680px) 230px;gap:24px;align-items:center;justify-content:center;padding:26px clamp(16px,3vw,44px) 18px;position:relative}.combatant-panel,.combat-rules{padding:20px}.combatant-panel h2,.combat-rules h2{font:700 21px serif;margin:8px 0 20px}.combat-values{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:17px}.combat-values span{border:1px solid var(--line);border-radius:7px;padding:10px;font-size:12px;color:var(--muted)}.combat-values b{display:block;color:var(--ink);font-size:18px;margin-top:3px}.power-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;min-height:28px}.power-list span{border:1px solid #b89a5066;border-radius:99px;padding:5px 8px;color:#ecd385;font-size:11px}.power-list small{color:var(--muted)}
+.enemy-zone{display:grid;justify-items:center;position:relative}.intent-card{min-width:220px;text-align:center;border:1px solid #bb695e66;background:#371e1bdd;border-radius:9px;padding:10px 16px;margin-bottom:12px}.intent-card span{display:block;color:#d89b93;font-size:11px;letter-spacing:.16em}.intent-card strong{display:block;font:700 17px serif;margin:3px}.intent-card p{margin:0;color:#f1c3bc;font-size:13px}.quiz-enemy{width:min(440px,100%);text-align:center;border:1px solid #5a756a;border-radius:15px;background:linear-gradient(145deg,#1a3e33,#0c211a);padding:28px;box-shadow:0 25px 65px #0008,inset 0 1px #ffffff12;transition:.18s}.quiz-enemy.hit{animation:enemyHit .28s}.quiz-enemy h1{font:700 clamp(32px,5vw,50px) serif;margin:8px 0}.quiz-enemy>p:not(.eyebrow){color:var(--muted);font-family:serif}.enemy-statuses{display:flex;justify-content:center;gap:8px;min-height:31px;margin:15px 0}.enemy-statuses span{border:1px solid #a98ac266;background:#352942;border-radius:7px;padding:6px 9px;font-size:12px}.enemy-statuses span:last-child{border-color:#6598b766;background:#253d4c}.enemy-hp-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;color:var(--muted);font-size:12px}.status-bar.enemy i{background:linear-gradient(90deg,#ac4138,#df7767)}.battle-float{position:absolute;top:48%;z-index:4;color:var(--gold);font-size:28px;font-weight:800;opacity:0;pointer-events:none}.battle-float.show{animation:floatUp .7s}.battle-log{height:22px;color:var(--muted);font-size:13px;margin:14px 0 0;text-align:center}.combat-rules>p:not(.eyebrow){font-size:13px;line-height:1.6;color:var(--muted)}.combat-rules dl{display:grid;grid-template-columns:1fr 1fr;gap:7px}.combat-rules dl div{border:1px solid var(--line);border-radius:7px;padding:9px}.combat-rules dt{font-size:10px;color:var(--muted)}.combat-rules dd{margin:3px 0 0;color:var(--gold);font:700 18px serif}
+.battle-desk{display:grid;grid-template-columns:90px 1fr 130px;align-items:end;gap:18px;min-height:240px;padding:16px clamp(16px,3vw,44px) 20px;border-top:1px solid #ffffff17;background:#071511dd}.energy-orb{align-self:center;display:flex;align-items:center;gap:6px}.energy-orb strong{display:grid;place-items:center;width:60px;height:60px;border:2px solid var(--gold);border-radius:50%;background:#18352b;color:var(--gold);font:800 27px serif}.energy-orb small{color:var(--muted);font-size:11px}.battle-hand{display:flex;justify-content:center;align-items:flex-end;gap:9px;min-width:0;overflow-x:auto;padding:16px 4px}.battle-card{position:relative;width:132px;min-width:132px;min-height:184px;padding:14px 12px 11px;border:1px solid #8f8066;border-radius:10px;background:linear-gradient(150deg,#f6efdf,#dcd0b6);color:#27312d;box-shadow:0 9px 22px #0007;cursor:pointer;text-align:left;transition:.15s}.battle-card:hover:not(:disabled),.battle-card:focus-visible:not(:disabled){transform:translateY(-12px);outline:2px solid var(--gold);z-index:3}.battle-card:disabled{filter:grayscale(.65) brightness(.64);cursor:not-allowed}.battle-card.skill{background:linear-gradient(150deg,#edf3f2,#c7d9da);border-color:#718fa1}.battle-card.power{background:linear-gradient(150deg,#eee7f4,#d1bddc);border-color:#8e70a0}.battle-card .card-cost{position:absolute;top:-10px;left:-8px;display:grid;place-items:center;width:33px;height:33px;border-radius:50%;background:#204b3e;color:#fff;border:2px solid #77aa99;font-weight:800}.battle-card .card-meta{margin:2px 0 18px 17px;color:#6b665d;font-size:10px;letter-spacing:.12em}.battle-card h3{font:800 17px serif;text-align:center;margin:0 0 11px}.battle-card .card-text{font-size:12px;line-height:1.5;margin:0}.battle-card .keyword{display:block;margin-top:8px;color:#7c4a3e;font-weight:700}.end-turn{align-self:center;border:1px solid #bb9c52;background:#46381a;color:#fff5d8;border-radius:9px;padding:14px 10px;cursor:pointer}.end-turn:disabled{opacity:.45;cursor:not-allowed}.end-turn strong,.end-turn span{display:block}.end-turn span{font-size:10px;color:#d6c99f;margin-top:4px}
+.reward-screen{display:grid;place-items:center;padding:28px}.reward-panel{width:min(900px,100%);padding:34px;text-align:center}.reward-panel h1{font:700 36px serif;margin:8px}.reward-copy{color:var(--muted)}.reward-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:28px 0}.reward-option{display:grid;gap:12px;justify-items:center}.reward-option .battle-card{width:100%;max-width:220px;min-height:235px}.reward-option button:last-child{width:min(180px,100%)}.rarity-common{color:#68756f}.rarity-uncommon{color:#397ca2}.rarity-rare{color:#9a5eb0}.meal-reward{display:flex;justify-content:center;align-items:center;gap:13px;border-top:1px solid var(--line);padding-top:20px;color:var(--muted)}.meal-reward strong{color:var(--gold);font:800 28px serif}
+.selection-card{width:min(720px,calc(100% - 32px));text-align:left}.selection-card h2,.selection-card>p{text-align:center}.selection-cards{display:flex;gap:10px;overflow-x:auto;padding:15px 3px}.selection-cards .battle-card{min-height:165px}.selection-cards .battle-card.chosen-card{outline:3px solid var(--gold);transform:translateY(-5px)}.selection-actions{display:flex;justify-content:center;gap:10px}.selection-actions .text-button,.selection-actions .primary-button{width:auto;margin:0;padding:11px 25px}.selection-actions .primary-button:disabled{opacity:.4;cursor:not-allowed}
+.node-stage{position:relative;width:min(980px,calc(100% - 32px));margin:0 auto;padding:70px 0}.node-intro{text-align:center;margin-bottom:34px}.node-intro h1{font:700 clamp(30px,5vw,48px) serif;margin:9px 0}.node-intro>p:last-child{color:var(--muted)}.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.choice-card{position:relative;min-height:390px;padding:42px 38px 34px;border:1px solid var(--line);border-radius:16px;background:#0b1d18e8;box-shadow:var(--shadow);overflow:hidden}.choice-card:before{content:"";position:absolute;inset:0;background:linear-gradient(140deg,#ffffff08,transparent 48%);pointer-events:none}.choice-card .choice-mark{display:grid;place-items:center;width:72px;height:72px;border:1px solid var(--gold);border-radius:50%;color:var(--gold);font:800 34px serif;margin-bottom:27px}.choice-card h2{font:700 31px serif;margin:8px 0 20px}.choice-card p:not(.eyebrow){min-height:55px;color:#c6d3cd;line-height:1.7}.choice-card small{display:block;min-height:40px;color:var(--muted)}.choice-card .primary-button{margin-top:30px}.study-choice{border-color:#6f597b}.study-choice .choice-mark{border-color:#b894c9;color:#d2aedf}.study-choice .primary-button{background:#b894c9}
+.shop-stage{position:relative;width:min(1160px,calc(100% - 32px));margin:0 auto;padding:36px 0 70px}.shop-heading{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:22px}.shop-heading h1{font:700 38px serif;margin:7px 0 0}.shop-heading>p{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.color-key{border:1px solid;border-radius:99px;padding:5px 9px;font-size:11px}.color-key.c{color:#77c29a}.color-key.a{color:#dc7e72}.color-key.b{color:#75a8d3}.color-key.n{color:#c5c5c5}.shop-section{margin-top:30px}.section-title{display:flex;align-items:end;justify-content:space-between;margin-bottom:12px}.section-title h2{font:700 22px serif;margin:0}.section-title small{color:var(--muted)}.shop-grid{display:grid;gap:12px}.card-goods{grid-template-columns:repeat(5,1fr)}.compact-goods{grid-template-columns:repeat(3,1fr)}.shop-item{position:relative;min-height:145px;padding:18px;border:1px solid #47725d;border-radius:11px;background:linear-gradient(145deg,#173a2c,#0b2119);display:flex;flex-direction:column}.shop-item.colorless{border-color:#777;background:linear-gradient(145deg,#333,#191919)}.shop-item.placeholder{border-style:dashed;opacity:.8}.shop-item h3{font:700 17px serif;margin:7px 0}.shop-item p{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 15px}.shop-item .shop-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;gap:8px}.shop-price{color:var(--gold);font-weight:800}.shop-buy{border:1px solid #72aa8f;background:#193e2f;border-radius:7px;padding:7px 10px;cursor:pointer}.shop-buy:disabled{opacity:.4;cursor:not-allowed}.shop-item.sold{filter:grayscale(.8);opacity:.55}.binge-panel{margin-top:34px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px}.binge-panel h2{font:700 23px serif;margin:6px 0}.binge-panel p{margin:0;color:var(--muted)}.binge-panel strong{color:var(--gold)}.binge-panel .primary-button{width:auto;min-width:210px}.card-goods .shop-item{min-height:210px}.card-goods .shop-item .rarity-tag{color:var(--gold);font-size:10px;letter-spacing:.12em}.card-goods .shop-item p{flex:1}
+.battle-card.class-card{background:linear-gradient(150deg,#dff1e7,#a9cdb8);border-color:#4b8b68}.battle-card.upgraded{box-shadow:0 0 0 2px #f1cb6688,0 9px 22px #0007}.deck-empty{text-align:center;color:var(--muted);width:100%;padding:28px}
+@keyframes enemyHit{25%{transform:translateX(-8px)}60%{transform:translateX(6px)}100%{transform:none}}@keyframes floatUp{0%{opacity:0;transform:translateY(10px)}25%{opacity:1}100%{opacity:0;transform:translateY(-38px)}}
+@media(max-width:1060px){.map-layout{grid-template-columns:190px minmax(420px,1fr)}.legend-panel{display:none}}
+@media(max-width:1060px){.battle-board{grid-template-columns:190px minmax(390px,1fr)}.combat-rules{display:none}}
+@media(max-width:760px){.role-grid{grid-template-columns:1fr}.topbar{grid-template-columns:1fr auto}.route-title{display:none}.map-layout{display:block;padding:10px}.profile-panel{position:static;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;padding:13px}.profile-panel h2{display:none}.status-line{align-self:end}.status-bar{grid-column:2}.run-stats{grid-column:1/-1;margin:4px 0}.deck-note{display:none}.map-viewport{height:calc(100vh - 322px);min-height:480px}.map-heading{min-height:72px;padding:12px 15px}.map-heading h1{font-size:20px}}
+@media(max-width:760px){.battle-header-id{font-size:11px}.battle-board{display:block;min-height:auto;padding:12px}.combatant-panel{display:grid;grid-template-columns:auto 1fr;gap:8px;margin-bottom:10px;padding:12px}.combatant-panel .eyebrow,.combatant-panel h2{display:none}.combatant-panel .status-line{align-self:end}.combatant-panel .status-bar{grid-column:2}.combat-values{grid-column:1/-1;margin-top:2px}.power-list{grid-column:1/-1;margin-top:2px}.quiz-enemy{padding:20px}.quiz-enemy h1{font-size:34px}.battle-desk{grid-template-columns:68px 1fr;min-height:235px;padding:8px}.battle-hand{justify-content:flex-start}.end-turn{grid-column:1/-1;justify-self:center;width:160px;padding:10px}.reward-cards{grid-template-columns:1fr;max-height:62vh;overflow:auto}.reward-option{grid-template-columns:1fr auto;align-items:center;text-align:left}.reward-option .battle-card{max-width:none;min-height:180px}.reward-option button:last-child{width:110px}}
+@media(max-width:900px){.card-goods{grid-template-columns:repeat(3,1fr)}.compact-goods{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.node-stage{padding:34px 0}.choice-grid{grid-template-columns:1fr}.choice-card{min-height:auto;padding:27px}.shop-heading{align-items:start;gap:16px}.shop-heading>p{display:none}.card-goods,.compact-goods{grid-template-columns:1fr 1fr}.binge-panel{align-items:stretch;flex-direction:column}.binge-panel .primary-button{width:100%}}
+@media(max-width:520px){.card-goods,.compact-goods{grid-template-columns:1fr}.section-title small{display:none}}
+@media(max-width:560px){.start-card{padding:25px 16px}.start-card>h1{font-size:42px}.id-field{grid-template-columns:76px 1fr;padding-left:10px}.field-hint{margin-left:88px}.role-card{grid-template-columns:45px 1fr;padding:13px;min-height:102px}.role-letter{width:42px;height:42px}.chosen{display:none}.role-copy strong{font-size:16px}.topbar{height:62px;padding:0 12px}.brand small{display:none}.map-layout{padding:8px}.profile-panel{margin-bottom:8px}.map-viewport{height:calc(100vh - 295px)}.map-node{width:50px;height:50px}.map-node small{top:54px}.map-tip{padding:10px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+.game-clock{position:fixed;z-index:28;right:18px;top:86px;width:150px;padding:10px 13px;border:1px solid #f1cb6655;border-radius:10px;background:#071611e8;box-shadow:0 10px 28px #0007;backdrop-filter:blur(9px);display:grid;gap:2px;text-align:right;pointer-events:none}.game-clock span{color:var(--gold);font-size:11px;letter-spacing:.12em}.game-clock strong{font:800 22px ui-monospace,Consolas,monospace;letter-spacing:.04em}.game-clock small{color:var(--muted);font-size:11px}.deck-button{width:100%;margin-top:14px;border:1px solid #f1cb6670;border-radius:8px;background:#f1cb6610;color:var(--gold);padding:10px;cursor:pointer;font-weight:700}.deck-button:hover{background:#f1cb6620;border-color:var(--gold)}.deck-view-card{width:min(1050px,calc(100% - 32px));max-height:88vh;text-align:left;padding:26px}.deck-view-head{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:16px}.deck-view-head h2{margin:5px 0 0;text-align:left;font-size:27px}.deck-view-head .text-button{justify-self:auto}.deck-view-tools{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0}.deck-view-tools p{margin:0;color:var(--muted);font-size:13px}.preview-toggle{border:1px solid #9b78ac;border-radius:99px;background:#392b42;color:#e3caeb;padding:9px 14px;cursor:pointer;white-space:nowrap}.preview-toggle[aria-pressed="true"]{border-color:var(--gold);background:#5c491f;color:#fff0bb}.deck-view-grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:13px;max-height:62vh;overflow:auto;padding:14px 8px 18px}.deck-view-grid .battle-card{width:100%;min-width:0;min-height:205px;cursor:default}.deck-view-grid .battle-card:hover{transform:none;outline:0}.deck-view-grid .previewing{box-shadow:0 0 0 2px #9b78ac,0 9px 22px #0007}.preview-label{display:block;margin-top:8px;color:#744487;font-weight:800}
+@media(max-width:900px){.deck-view-grid{grid-template-columns:repeat(3,minmax(130px,1fr))}.game-clock{right:10px;top:78px}}
+@media(max-width:600px){.game-clock{top:70px;right:8px;bottom:auto;width:128px;padding:7px 9px}.game-clock strong{font-size:18px}.game-clock small{display:none}.deck-view-card{padding:18px 13px}.deck-view-tools{align-items:stretch;flex-direction:column}.deck-view-grid{grid-template-columns:1fr 1fr;gap:9px}.deck-view-grid .battle-card{min-height:185px}.deck-view-head h2{font-size:21px}}
+.event-stage{display:grid;place-items:center;min-height:calc(100vh - 74px)}.event-card{width:min(560px,100%);padding:48px;text-align:center}.event-mark{display:grid;place-items:center;width:82px;height:82px;margin:0 auto 25px;border:2px solid #b394c3;border-radius:50%;background:#352942;color:#e0c2ed;font:800 42px serif}.event-card h1{font:700 36px serif;margin:10px}.event-card>p:not(.eyebrow){color:var(--muted);font-size:16px}.event-card>small{display:block;color:#758a80;margin:18px 0 28px}.sport-stage{width:min(1180px,calc(100% - 32px))}.sport-choice-grid{grid-template-columns:repeat(3,1fr)}.sport-choice{min-height:365px;padding:34px 28px}.sport-choice:nth-child(2){border-color:#a95f55}.sport-choice:nth-child(2) .choice-mark{border-color:#d7796c;color:#ed9a8f}.sport-choice:nth-child(3){border-color:#557fa5}.sport-choice:nth-child(3) .choice-mark{border-color:#76a9d3;color:#a8d2f3}.sport-choice strong{color:var(--gold)}
+@media(max-width:900px){.sport-choice-grid{grid-template-columns:1fr}.sport-choice{min-height:auto}}
+@media(max-width:600px){.event-card{padding:32px 20px}.event-card h1{font-size:29px}.sport-stage{padding-top:28px}}
+.map-node.exam.available{background:#704028;border-color:#ffb266;box-shadow:0 0 0 5px #ff9b3d18,0 0 28px #ff8a3055}.node-sample.exam{background:#704028;border-color:#d99055}.run-relics{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.run-relics span{border:1px solid #d1aa5766;border-radius:99px;padding:5px 8px;color:#f0d28a;font-size:11px}.run-relics small{color:var(--muted)}.relic-reward-panel{max-width:560px}.relic-reward-card{margin:28px auto;width:min(380px,100%);padding:28px;border:1px solid #d1aa57;border-radius:13px;background:linear-gradient(145deg,#3e3019,#17140d);text-align:left}.relic-reward-card h2{font:700 27px serif;margin:8px 0}.relic-reward-card p{color:#d9c89d;line-height:1.7}.relic-reward-card small{color:var(--gold)}.shop-item.relic-item{border-color:#b69248;background:linear-gradient(145deg,#3b301c,#18150e)}.shop-item.colorless-card{border-color:#9a9a9a;background:linear-gradient(145deg,#424242,#202020)}.battle-card.colorless-card{background:linear-gradient(150deg,#ececec,#bdbdbd);border-color:#777}
+.relic-detail-button{margin-top:9px}.pile-view-button{width:100%;display:flex;align-items:end;justify-content:space-between;gap:5px;padding:0;border:0;background:transparent;color:var(--gold);cursor:pointer;text-align:left}.pile-view-button b{font:700 18px serif}.pile-view-button small{color:var(--muted);font-size:9px}.pile-view-button:hover small{color:var(--gold)}.collection-card{width:min(1040px,calc(100% - 32px));max-height:88vh;text-align:left;padding:26px}.collection-head{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:15px}.collection-head h2{margin:5px 0 0;text-align:left;font-size:27px}.collection-card>p{margin:14px 0 0;color:var(--muted);font-size:13px}.collection-grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:13px;max-height:62vh;overflow:auto;padding:18px 8px}.collection-grid .battle-card{width:100%;min-width:0;min-height:205px;cursor:default;filter:none}.collection-grid .battle-card:hover{transform:none;outline:0}.collection-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:32px}.relic-detail-grid{grid-template-columns:repeat(3,1fr)}.relic-detail-item{min-height:150px;padding:20px;border:1px solid #b69248;border-radius:11px;background:linear-gradient(145deg,#3b301c,#18150e)}.relic-detail-item small{color:var(--gold)}.relic-detail-item h3{font:700 20px serif;margin:8px 0}.relic-detail-item p{color:#d9c89d;font-size:13px;line-height:1.65;margin:0}
+@media(max-width:760px){.collection-grid{grid-template-columns:1fr 1fr;gap:9px}.relic-detail-grid{grid-template-columns:1fr}.collection-card{padding:18px 13px}.collection-head h2{font-size:21px}}
+
+.boss-preview{font-size:13px;color:var(--gold);margin:8px 0 0}
+.player-debuffs{display:grid;gap:6px;margin-top:10px;grid-column:1/-1}
+.player-debuffs:empty{display:none}
+.player-debuffs span{background:#482823;border:1px solid #a7675d;border-radius:6px;padding:7px;color:#ffcdc3;font-size:12px;line-height:1.5}
+.reward-skip{display:block;margin:16px auto;min-height:44px}
+#enemyDescription{line-height:1.6;font-size:14px}
+@media(min-width:761px){
+  .battle-screen{height:100vh;height:100dvh;min-height:0;display:grid;grid-template-rows:74px minmax(0,1fr) auto;overflow:hidden}
+  .battle-screen .battle-board{min-height:0;overflow:auto;align-items:start;padding:22px 20px;grid-template-columns:minmax(160px,210px) minmax(280px,600px) minmax(150px,210px);gap:16px}
+  .battle-screen .combat-rules{display:block}
+  .battle-screen .battle-desk{position:relative;bottom:auto;z-index:12;min-height:230px;max-height:45dvh;padding:10px 20px 14px;grid-template-columns:80px minmax(0,1fr) 120px;overflow:auto;box-shadow:0 -12px 35px #0006}
+  .battle-screen .battle-hand{justify-content:flex-start;padding:18px 10px 8px;min-width:0;align-items:stretch;scroll-padding:12px}
+  .battle-screen .battle-card{flex:0 0 144px;min-height:195px}
+  .battle-screen .battle-card .card-text{font-size:13px}
+  .battle-screen .quiz-enemy{padding:18px}
+  .battle-screen .quiz-enemy h1{font-size:32px}
+  .battle-screen .game-clock{pointer-events:none}
+}
+/* Route geometry uses the same independent X/Y scaling as the node layer. */
+.route-line{stroke:#668b7d;stroke-width:2.5;stroke-dasharray:none;opacity:.7;stroke-linecap:round}
+.route-line.available{stroke:#ffda77;stroke-width:4;opacity:1}
+.route-line.visited{stroke:#91c6b0;stroke-width:3;opacity:.9}
+.route-arrow{fill:none;stroke:#90b5a5;stroke-width:2;vector-effect:non-scaling-stroke;pointer-events:none}
+.route-arrow.available{stroke:#ffda77;stroke-width:3}
+.route-arrow.visited{stroke:#91c6b0}
+.map-node small{background:#091914ed;border:1px solid #426458;border-radius:5px;padding:3px 2px;color:#cfdfd7;white-space:nowrap;pointer-events:none}
+.map-node.available small{color:#ffda77;border-color:#b69849}
+.map-node.locked{cursor:pointer}
+.map-node.current small{color:#ffda77}
+.route-inspecting .route-line,.route-inspecting .route-arrow{opacity:.13}
+.route-inspecting .map-node:not(.route-focused){opacity:.35}
+.route-inspecting .route-line.route-focused,.route-inspecting .route-arrow.route-focused{stroke:#fff0b6;opacity:1;stroke-width:4}
+.map-node.route-focused{outline:2px solid #fff0b6;outline-offset:4px}
+/* 手机竖屏：把主要操作压进拇指可达区域，并保留所有战斗信息入口。 */
+@media (orientation:portrait) and (max-width:760px){
+  html{min-width:320px;overflow-x:hidden}
+  body{min-width:320px;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom)}
+  button{min-height:44px;touch-action:manipulation}
+  .start-screen,.map-screen,.node-screen,.battle-screen,.reward-screen{min-height:100dvh}
+  .start-screen{display:block;padding:max(18px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom));overflow:auto}
+  .start-card{width:calc(100vw - 24px);max-width:calc(100vw - 24px);margin:0 auto;padding:22px 15px;border-radius:14px}
+  .seal{width:52px;height:52px;font-size:29px;margin-bottom:8px}
+  .start-card>h1{font-size:36px;margin-top:4px}
+  .chapter{margin-bottom:19px;font-size:13px}
+  .id-field{grid-template-columns:72px 1fr;padding-left:9px}
+  .id-field input{min-width:0;padding:13px 11px;font-size:16px}
+  .field-hint{margin:6px 0 17px 84px}
+  .role-card{grid-template-columns:42px minmax(0,1fr);min-height:88px;padding:12px;gap:10px;overflow:hidden}
+  .role-card .chosen{display:none}
+  .role-copy{min-width:0;max-width:100%}.role-copy strong{font-size:16px}.role-copy em{display:block;max-width:100%;font-size:12px;line-height:1.45;white-space:normal;overflow-wrap:anywhere;word-break:break-all}
+
+  .topbar{height:58px;padding:env(safe-area-inset-top) 10px 0;grid-template-columns:1fr auto}
+  .brand{gap:7px}.brand-mark{width:34px;height:34px;font-size:20px}.brand strong{font-size:15px}.brand small{display:none}
+  .topbar>.text-button{min-height:38px;padding:7px 10px;font-size:12px}
+  .game-clock{top:4px;left:50%;right:auto;transform:translateX(-50%);width:90px;padding:5px;border:0;background:transparent;box-shadow:none;text-align:center;z-index:22}
+  .game-clock span,.game-clock small{display:none}.game-clock strong{font-size:15px;color:var(--gold)}
+
+  .map-layout{display:flex;flex-direction:column;gap:8px;padding:8px}
+  .profile-panel{position:static;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:11px}
+  .profile-head{min-width:0}.profile-head strong{max-width:115px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .profile-panel h2,.deck-note,.run-relics{display:none}
+  .profile-panel .status-line{align-self:end;margin:0}.profile-panel>.status-bar{grid-column:2}
+  .run-stats{grid-column:1/-1;grid-template-columns:repeat(4,1fr);gap:5px;margin:2px 0}
+  .run-stats div{padding:7px 4px;text-align:center}.run-stats dt{font-size:10px}.run-stats dd{font-size:15px;margin-top:2px}
+  .profile-panel .deck-button{margin:0;padding:8px 5px;min-height:40px;font-size:12px}
+  .map-panel{width:100%}.map-heading{min-height:62px;padding:10px 12px}.map-heading h1{font-size:19px}.map-heading .text-button{min-height:38px;padding:7px 9px}
+  .map-viewport{height:calc(100dvh - 300px);min-height:380px;overscroll-behavior:contain}
+  .map-canvas{min-width:340px}.map-node{width:48px;height:48px}.map-node small{top:51px;font-size:10px}.map-node.boss{width:58px;height:58px}.map-node.boss small{top:63px}
+  .map-tip{padding:9px 12px;font-size:11px}
+
+  .node-stage,.shop-stage,.sport-stage{width:calc(100% - 20px);padding:25px 0 34px}
+  .node-intro{margin-bottom:18px}.node-intro h1,.shop-heading h1{font-size:29px}.node-intro>p:last-child{font-size:13px}
+  .choice-grid,.sport-choice-grid{grid-template-columns:1fr;gap:12px}
+  .choice-card,.sport-choice{min-height:auto;padding:23px 19px}.choice-card .choice-mark{width:54px;height:54px;font-size:27px;margin-bottom:15px}.choice-card h2{font-size:25px;margin:7px 0 12px}.choice-card p:not(.eyebrow){min-height:0;font-size:14px}.choice-card .primary-button{margin-top:18px}
+  .shop-heading{align-items:flex-start}.shop-heading>p{display:none}.shop-section{margin-top:22px}.card-goods,.compact-goods{grid-template-columns:1fr}.shop-item,.card-goods .shop-item{min-height:auto}.binge-panel{margin-top:22px;padding:18px;align-items:stretch;flex-direction:column}.binge-panel .primary-button{width:100%;min-width:0}
+  .event-stage{min-height:calc(100dvh - 58px);padding:12px}.event-card{padding:28px 18px}.event-card h1{font-size:28px}.event-card>p:not(.eyebrow){font-size:14px}
+
+  .battle-board{display:block;min-height:auto;padding:8px 8px 0}
+  .combatant-panel{display:grid;grid-template-columns:auto 1fr;gap:6px;margin-bottom:7px;padding:9px 11px}
+  .combatant-panel .eyebrow,.combatant-panel h2{display:none}.combatant-panel .status-line{align-self:end;margin:0}.combatant-panel .status-bar{grid-column:2}.combat-values{grid-column:1/-1;margin-top:0;gap:5px}.combat-values span{padding:6px;font-size:11px}.combat-values b{display:inline;margin:0 0 0 5px;font-size:15px}.power-list{grid-column:1/-1;min-height:0;margin:0}
+  .intent-card{min-width:0;width:100%;margin-bottom:7px;padding:7px 10px}.intent-card strong{font-size:15px}.intent-card p{font-size:12px}
+  .quiz-enemy{padding:13px 15px}.quiz-enemy h1{font-size:27px;margin:5px 0}.quiz-enemy>p:not(.eyebrow){font-size:12px;margin:5px}.enemy-statuses{margin:7px 0;min-height:26px}.enemy-hp-row{gap:6px}
+  .battle-log{height:auto;min-height:18px;margin:7px 0;font-size:11px}
+  .combat-rules{display:block!important;margin-top:7px;padding:7px;background:#091914ed}
+  .combat-rules>.eyebrow,.combat-rules>h2,.combat-rules>p{display:none}.combat-rules dl{grid-template-columns:repeat(3,1fr);gap:5px;margin:0}.combat-rules dl div{padding:6px}.combat-rules dt{font-size:10px}.combat-rules dd{margin-top:2px}.pile-view-button{min-height:30px}.pile-view-button b{font-size:16px}.pile-view-button small{font-size:10px}
+  .battle-desk{position:sticky;bottom:0;z-index:12;grid-template-columns:58px 1fr 86px;grid-template-rows:auto auto;gap:6px;min-height:0;padding:7px 8px max(8px,env(safe-area-inset-bottom));align-items:center;box-shadow:0 -10px 30px #0009}
+  .energy-orb{grid-column:1;grid-row:1;align-self:center}.energy-orb strong{width:48px;height:48px;font-size:22px}.energy-orb small{display:none}
+  .end-turn{grid-column:3;grid-row:1;width:86px;justify-self:end;padding:9px 6px}.end-turn strong{font-size:13px}.end-turn span{display:none}
+  .battle-hand{grid-column:1/-1;grid-row:2;justify-content:flex-start;gap:7px;padding:8px 3px 4px;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+  .battle-hand .battle-card{scroll-snap-align:center;width:112px;min-width:112px;min-height:158px;padding:12px 9px 8px}.battle-card .card-meta{margin-bottom:11px}.battle-card h3{font-size:15px;margin-bottom:8px}.battle-card .card-text{font-size:11px;line-height:1.4}
+
+  .reward-screen{display:block;padding:12px}.reward-panel{padding:22px 13px}.reward-panel h1{font-size:28px}.reward-cards{grid-template-columns:1fr;gap:12px;margin:18px 0;max-height:none;overflow:visible}.reward-option{grid-template-columns:1fr auto;gap:8px}.reward-option .battle-card{min-height:170px}.reward-option button:last-child{width:92px;padding:9px}
+  .modal{align-items:end;padding-top:env(safe-area-inset-top)}.modal-card,.selection-card,.deck-view-card,.collection-card{width:100%;max-height:90dvh;margin:0;padding:19px 13px max(18px,env(safe-area-inset-bottom));border-left:0;border-right:0;border-bottom:0;border-radius:16px 16px 0 0;overflow:auto}
+  .deck-view-head,.collection-head{position:sticky;top:-19px;z-index:2;background:#112820;padding:12px 0}.deck-view-tools{padding:11px 0}.deck-view-grid,.collection-grid{grid-template-columns:1fr 1fr;gap:8px;max-height:none;padding:8px 2px}.deck-view-grid .battle-card,.collection-grid .battle-card{min-height:174px}.relic-detail-grid{grid-template-columns:1fr}.selection-cards{padding:10px 2px}.selection-cards .battle-card{min-width:116px}.selection-actions{position:sticky;bottom:0;background:#112820;padding-top:8px}
+}
+
+@media (orientation:portrait) and (max-width:380px){
+  .run-stats{grid-template-columns:repeat(3,1fr)}
+  .map-viewport{height:calc(100dvh - 335px);min-height:345px}
+  .deck-view-grid,.collection-grid{grid-template-columns:1fr 1fr}
+  .deck-view-grid .battle-card,.collection-grid .battle-card{min-height:164px;padding:11px 8px}
+}
+
+  </style>
+</head>
+<body>
+  <aside class="game-clock" aria-label="当前真实时间">
+    <span>真实时间</span>
+    <strong id="realTime">00:00:00</strong>
+    <small id="realDate">0000年00月00日</small>
+  </aside>
+  <main id="startScreen" class="start-screen">
+    <section class="start-card" aria-labelledby="gameTitle">
+      <div class="seal" aria-hidden="true">定</div>
+      <p class="eyebrow">校园牌组构筑游戏</p>
+      <h1 id="gameTitle">定中尖塔</h1>
+      <p class="chapter">v0.0.2 · 第1层 · 高一</p>
+      <form id="startForm" novalidate>
+        <label class="id-field" for="playerId"><span>学生 ID</span><input id="playerId" name="playerId" maxlength="16" autocomplete="off" placeholder="输入你的 ID" aria-describedby="idHint"></label>
+        <p id="idHint" class="field-hint">ID 仅用于本次游戏显示</p>
+        <fieldset>
+          <legend>选择角色</legend>
+          <div class="role-grid">
+            <label class="role-card selected">
+              <input type="radio" name="role" value="c" checked>
+              <span class="role-letter">C</span>
+              <span class="role-copy"><strong>C部 · 创新班学生</strong><small>思路 · 消耗 · 爆发</small><em>快速作答×4　整理思路×4　头脑风暴×1　竞赛神话×1</em></span>
+              <span class="chosen">已选择</span>
+            </label>
+            <div class="role-card locked" aria-disabled="true">
+              <span class="role-letter">?</span>
+              <span class="role-copy"><strong>待定角色</strong><small>尚未开放</small><em>角色体系等待设计</em></span>
+              <span class="chosen">待定</span>
+            </div>
+          </div>
+        </fieldset>
+        <p class="form-error" id="formError" aria-live="polite"></p>
+        <button class="primary-button" type="submit">开始游戏</button>
+      </form>
+    </section>
+  </main>
+
+  <main id="mapScreen" class="map-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>第一层 · 高一</small></div></div>
+      <div class="route-title"><small>路线规划</small><strong id="routeStatus">从教学楼入口出发</strong></div>
+      <button id="newRun" class="text-button" type="button">返回选角</button>
+    </header>
+    <div class="map-layout">
+      <aside class="profile-panel panel">
+        <div class="profile-head"><span class="role-letter small">C</span><div><small>玩家 ID</small><strong id="displayId"></strong></div></div>
+        <h2>C部 · 创新班学生</h2>
+        <div class="status-line"><span>专注</span><b>80 / 80</b></div>
+        <div class="status-bar"><i></i></div>
+        <dl class="run-stats">
+          <div><dt>当前阶段</dt><dd id="floorText">入口</dd></div>
+          <div><dt>已通过</dt><dd id="visitedText">0</dd></div>
+          <div><dt>饭卡价值</dt><dd id="mealText">400</dd></div>
+          <div><dt>牌组</dt><dd id="deckCount">10</dd></div>
+          <div><dt>力量</dt><dd id="strengthText">0</dd></div>
+          <div><dt>敏捷</dt><dd id="dexterityText">0</dd></div>
+          <div><dt>圣遗物</dt><dd id="relicCount">0</dd></div>
+        </dl>
+        <div class="deck-note"><small>初始牌组 · 10张</small><span>快速作答×4　整理思路×4</span><span>头脑风暴×1　竞赛神话×1</span></div>
+        <button id="inspectDeck" class="deck-button" type="button">查看当前牌组</button>
+        <div id="relicList" class="run-relics"><small>暂无圣遗物</small></div>
+        <button id="inspectRelics" class="deck-button relic-detail-button" type="button">查看圣遗物详情</button>
+      </aside>
+      <section class="map-panel panel" aria-labelledby="mapTitle">
+        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1><p id="bossPreview" class="boss-preview"></p></div></div>
+        <p class="map-tip">由下向上前进 · 金色线可走 · 浅绿色线已走<br>触摸未解锁节点或悬停查看相连路线；点击亮起节点进入。</p>
+        <div id="mapViewport" class="map-viewport">
+          <div id="mapCanvas" class="map-canvas" aria-label="随机生成的一层路线地图">
+            <svg id="routeLines" class="route-lines" aria-hidden="true"></svg>
+            <div id="mapNodes"></div>
+          </div>
+        </div>
+        <p class="map-tip" id="mapTip">选择底部任一亮起的节点开始。进入节点后，只能沿连线继续向上。</p>
+      </section>
+      <aside class="legend-panel panel">
+        <p class="eyebrow">节点类型</p><h2>高一校园</h2>
+        <ul class="legend-list">
+          <li><span class="node-sample battle">课</span><div><strong>上课</strong><small>战斗节点</small></div></li>
+          <li><span class="node-sample exam">月</span><div><strong>月考</strong><small>精英战斗节点</small></div></li>
+          <li><span class="node-sample dorm">舍</span><div><strong>宿舍</strong><small>休整节点</small></div></li>
+          <li><span class="node-sample canteen">食</span><div><strong>食堂</strong><small>采购节点</small></div></li>
+          <li><span class="node-sample event">超</span><div><strong>超市</strong><small>随机节点</small></div></li>
+          <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
+          <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
+        </ul>
+        <div class="placeholder-note"><strong>当前版本</strong><p>上课与月考各有3种敌人。期末随机生成主课＋文科、主课＋理科或主课＋体育的1种 Boss。</p></div>
+      </aside>
+    </div>
+  </main>
+
+  <main id="dormScreen" class="node-screen dorm-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>宿舍 · 休整节点</small></div></div>
+      <div class="route-title"><small>熄灯之前</small><strong id="restCycleTitle">午休</strong></div>
+      <div class="battle-header-id">ID　<strong id="dormPlayerId"></strong></div>
+    </header>
+    <section class="node-stage">
+      <div class="node-intro"><p class="eyebrow">宿舍节点</p><h1>在下一节课前做出选择</h1><p id="dormStatus">安静的宿舍里，时间只够完成1件事。</p></div>
+      <div class="choice-grid">
+        <article class="choice-card rest-choice">
+          <span class="choice-mark">休</span><p class="eyebrow" id="restCycleLabel">午休</p><h2>休息</h2>
+          <p>恢复专注上限的 <strong id="restPercent">25%</strong>。</p><small id="restPreview">预计恢复 10 点专注</small>
+          <button id="chooseRest" class="primary-button" type="button">开始午休</button>
+        </article>
+        <article class="choice-card study-choice">
+          <span class="choice-mark">修</span><p class="eyebrow">挑灯修读</p><h2>升级1张卡牌</h2>
+          <p>从当前牌组选择1张尚未升级的卡牌，强化至本次游戏结束。</p><small>已升级的卡牌会显示“+”</small>
+          <button id="chooseUpgrade" class="primary-button" type="button">选择卡牌</button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <main id="canteenScreen" class="node-screen canteen-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>食堂 · 采购节点</small></div></div>
+      <div class="route-title"><small>今日余额</small><strong>饭卡价值 <span id="shopMeal">0</span></strong></div>
+      <button id="leaveCanteen" class="text-button" type="button">离开食堂</button>
+    </header>
+    <section class="shop-stage">
+      <div class="shop-heading"><div><p class="eyebrow">食堂货架</p><h1>C部专属货架</h1></div><p><span class="color-key c">C部绿色</span><span class="color-key a">A部红色</span><span class="color-key b">B部蓝色</span><span class="color-key n">无色</span></p></div>
+      <section class="shop-section"><div class="section-title"><h2>角色卡牌</h2><small>5张 · 普通 7 / 罕见 2 / 稀有 1</small></div><div id="classShopCards" class="shop-grid card-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>无色卡牌</h2><small>2张 · 普通 7 / 罕见 2 / 稀有 1</small></div><div id="colorlessShopCards" class="shop-grid compact-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>圣遗物</h2><small>3件 · 每件 340—360</small></div><div id="relicShopItems" class="shop-grid compact-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>食物</h2><small>3种 · 内容与价格待设计</small></div><div id="foodShopItems" class="shop-grid compact-goods"></div></section>
+      <section class="binge-panel panel"><div><p class="eyebrow">暴食</p><h2>从牌组移除1张卡牌</h2><p>本次价格 <strong id="bingePrice">150</strong>，每次暴食后价格 +75。</p></div><button id="bingeButton" class="primary-button" type="button">选择要移除的牌</button></section>
+    </section>
+  </main>
+
+  <main id="eventScreen" class="node-screen event-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>超市 · 随机节点</small></div></div>
+      <div class="route-title"><small>偶遇</small><strong>随机事件</strong></div>
+      <div class="battle-header-id">ID　<strong id="eventPlayerId"></strong></div>
+    </header>
+    <section class="node-stage event-stage">
+      <article class="event-card panel">
+        <span class="event-mark">?</span>
+        <p class="eyebrow">超市随机事件</p>
+        <h1 id="eventTitle">未命名事件 01</h1>
+        <p>事件内容与选项等待后续设计。</p>
+        <small>每次进入超市都会重新抽取1个事件槽位。</small>
+        <button id="leaveEvent" class="primary-button" type="button">继续前进</button>
+      </article>
+    </section>
+  </main>
+
+  <main id="sportScreen" class="node-screen sport-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>操场 · 体育节点</small></div></div>
+      <div class="route-title"><small>自由活动</small><strong>选择1项训练</strong></div>
+      <div class="battle-header-id">ID　<strong id="sportPlayerId"></strong></div>
+    </header>
+    <section class="node-stage sport-stage">
+      <div class="node-intro"><p class="eyebrow">操场节点</p><h1>今天练什么？</h1><p>选择1项加成，效果持续到本次游戏结束。</p></div>
+      <div class="choice-grid sport-choice-grid">
+        <article class="choice-card sport-choice"><span class="choice-mark">跑</span><p class="eyebrow">跑步</p><h2>耐力训练</h2><p>最大专注增加 <strong>5</strong>。</p><small>当前专注不变。</small><button class="primary-button sport-option" data-sport="run" type="button">选择跑步</button></article>
+        <article class="choice-card sport-choice"><span class="choice-mark">篮</span><p class="eyebrow">篮球</p><h2>力量训练</h2><p>获得 <strong>1</strong> 点力量。</p><small>每点力量使每段攻击伤害 +1。</small><button class="primary-button sport-option" data-sport="basketball" type="button">选择篮球</button></article>
+        <article class="choice-card sport-choice"><span class="choice-mark">羽</span><p class="eyebrow">羽毛球</p><h2>敏捷训练</h2><p>获得 <strong>1</strong> 点敏捷。</p><small>每点敏捷使卡牌获得的防御 +1。</small><button class="primary-button sport-option" data-sport="badminton" type="button">选择羽毛球</button></article>
+      </div>
+    </section>
+  </main>
+
+  <main id="battleScreen" class="battle-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small id="battleNodeLabel">上课 · 战斗节点</small></div></div>
+      <div class="route-title"><small id="battleEncounterTitle">随堂小测</small><strong id="battleTurn">第1回合</strong></div>
+      <div class="battle-header-id">ID　<strong id="battlePlayerId"></strong></div>
+    </header>
+    <section class="battle-board">
+      <aside class="combatant-panel panel">
+        <span class="role-letter small">C</span>
+        <p class="eyebrow">C部 · 创新班学生</p>
+        <h2 id="battleRoleName">创新班学生</h2>
+        <div class="status-line"><span>专注</span><b id="battleHpText">80 / 80</b></div>
+        <div class="status-bar"><i id="battleHpBar"></i></div>
+        <div class="combat-values"><span>防御 <b id="battleBlock">0</b></span><span>思路增幅 <b id="nextAttackState">无</b></span><span>力量 <b id="battleStrength">0</b></span><span>敏捷 <b id="battleDexterity">0</b></span></div>
+        <div id="powerList" class="power-list"><small>暂无天赋</small></div>
+        <div id="playerDebuffs" class="player-debuffs" aria-live="polite"></div>
+      </aside>
+
+      <section class="enemy-zone">
+        <div class="intent-card" aria-live="polite">
+          <span>下一步意图</span>
+          <strong id="intentName">基础题</strong>
+          <p id="intentText">造成6点压力</p>
+        </div>
+        <article id="quizEnemy" class="quiz-enemy">
+          <p class="eyebrow">课堂挑战</p>
+          <h1 id="quizTitle">随堂小测</h1>
+          <p id="enemyDescription">请观察题型与敌人意图。</p>
+          <div class="enemy-statuses"><span id="enemyThought" hidden>思路 <b>0</b></span><span id="enemyBlock" hidden>防御 <b>0</b></span></div>
+          <div class="enemy-hp-row"><span>测验进度</span><div class="status-bar enemy"><i id="quizHpBar"></i></div><b id="quizHpText">52 / 52</b></div>
+        </article>
+        <div id="battleFloat" class="battle-float" aria-live="polite"></div>
+        <p id="battleLog" class="battle-log">试卷已经发下，先观察题型。</p>
+      </section>
+
+      <aside class="combat-rules panel">
+        <p class="eyebrow">战斗信息</p>
+        <h2>意图始终可见</h2>
+        <p>意图显示本回合攻击压力（已计入紧张，防御可抵挡）。减益在敌方行动后减少1回合，新施加的减益从下一玩家回合生效。</p>
+        <dl>
+          <div><dt>抽牌堆</dt><dd><button class="pile-view-button" data-pile="draw" type="button"><b id="battleDraw">10</b><small>查看</small></button></dd></div>
+          <div><dt>弃牌堆</dt><dd><button class="pile-view-button" data-pile="discard" type="button"><b id="battleDiscard">0</b><small>查看</small></button></dd></div>
+          <div><dt>消耗牌堆</dt><dd><button class="pile-view-button" data-pile="exhaust" type="button"><b id="battleExhaust">0</b><small>查看</small></button></dd></div>
+        </dl>
+      </aside>
+    </section>
+    <section class="battle-desk">
+      <div class="energy-orb"><strong id="battleEnergy">3</strong><small>/ 3<br>行动力</small></div>
+      <div id="battleHand" class="battle-hand" aria-label="当前手牌"></div>
+      <button id="battleEndTurn" class="end-turn" type="button"><strong>结束回合</strong><span>执行敌方意图</span></button>
+    </section>
+  </main>
+
+  <main id="rewardScreen" class="reward-screen" hidden>
+    <section class="reward-panel panel">
+      <p id="rewardEyebrow" class="eyebrow">上课节点完成</p>
+      <h1 id="rewardTitle">选择1张卡牌</h1>
+      <p class="reward-copy">将选择的卡牌永久加入本次牌组。</p>
+      <div id="rewardCards" class="reward-cards"></div>
+      <button id="skipCardReward" class="text-button reward-skip" type="button">跳过本次卡牌奖励</button>
+      <div class="meal-reward"><span>本次获得饭卡价值</span><strong id="mealReward">0</strong></div>
+    </section>
+  </main>
+
+  <main id="relicRewardScreen" class="reward-screen" hidden>
+    <section class="reward-panel relic-reward-panel panel">
+      <p class="eyebrow">考试额外奖励</p>
+      <h1>获得1件圣遗物</h1>
+      <div id="relicRewardCard" class="relic-reward-card"></div>
+      <button id="claimRelic" class="primary-button" type="button">收下圣遗物</button>
+      <button id="skipRelicReward" class="text-button reward-skip" type="button">不拿圣遗物</button>
+    </section>
+  </main>
+
+  <div id="finishModal" class="modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
+      <p class="eyebrow">第一层路线完成</p><h2 id="finishTitle">抵达期末节点</h2>
+      <p id="finishSummary">你完成了本层期末考试。</p>
+      <button id="restartMap" class="primary-button" type="button">返回主界面</button>
+    </section>
+  </div>
+
+  <div id="selectionModal" class="modal" hidden>
+    <section class="modal-card selection-card" role="dialog" aria-modal="true" aria-labelledby="selectionTitle">
+      <p class="eyebrow">卡牌选择</p>
+      <h2 id="selectionTitle">选择要消耗的牌</h2>
+      <p id="selectionHint"></p>
+      <div id="selectionCards" class="selection-cards"></div>
+      <div class="selection-actions"><button id="cancelSelection" class="text-button" type="button">取消</button><button id="confirmSelection" class="primary-button" type="button">确认</button></div>
+    </section>
+  </div>
+
+  <div id="deckActionModal" class="modal" hidden>
+    <section class="modal-card selection-card" role="dialog" aria-modal="true" aria-labelledby="deckActionTitle">
+      <p class="eyebrow">牌组管理</p>
+      <h2 id="deckActionTitle">选择1张卡牌</h2>
+      <p id="deckActionHint"></p>
+      <div id="deckActionCards" class="selection-cards"></div>
+      <div class="selection-actions"><button id="cancelDeckAction" class="text-button" type="button">取消</button></div>
+    </section>
+  </div>
+
+  <div id="deckViewModal" class="modal" hidden>
+    <section class="modal-card deck-view-card" role="dialog" aria-modal="true" aria-labelledby="deckViewTitle">
+      <div class="deck-view-head">
+        <div><p class="eyebrow">当前牌组</p><h2 id="deckViewTitle">C部牌组 · <span id="deckViewCount">0</span>张</h2></div>
+        <button id="closeDeckView" class="text-button" type="button">关闭</button>
+      </div>
+      <div class="deck-view-tools">
+        <p id="deckViewHint">显示当前实际效果，已升级卡牌带有“+”。</p>
+        <button id="toggleUpgradePreview" class="preview-toggle" type="button" aria-pressed="false">显示升级后效果</button>
+      </div>
+      <div id="deckViewCards" class="deck-view-grid"></div>
+    </section>
+  </div>
+
+  <div id="utilityChoiceModal" class="modal" hidden>
+    <section class="modal-card selection-card" role="dialog" aria-modal="true" aria-labelledby="utilityChoiceTitle">
+      <p class="eyebrow">卡牌选择</p>
+      <h2 id="utilityChoiceTitle">选择1张牌</h2>
+      <p id="utilityChoiceHint"></p>
+      <div id="utilityChoiceCards" class="selection-cards"></div>
+    </section>
+  </div>
+
+  <div id="collectionModal" class="modal" hidden>
+    <section class="modal-card collection-card" role="dialog" aria-modal="true" aria-labelledby="collectionTitle">
+      <div class="collection-head">
+        <div><p class="eyebrow">信息查看</p><h2 id="collectionTitle">牌堆</h2></div>
+        <button id="closeCollection" class="text-button" type="button">关闭</button>
+      </div>
+      <p id="collectionHint"></p>
+      <div id="collectionGrid" class="collection-grid"></div>
+    </section>
+  </div>
+
+  <div id="defeatModal" class="modal" hidden>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="defeatTitle">
+      <p class="eyebrow">专注耗尽</p><h2 id="defeatTitle">需要重新作答</h2>
+      <p>调整打防顺序，重新挑战当前敌人。</p>
+      <button id="retryBattle" class="primary-button" type="button">重新挑战</button>
+    </section>
+  </div>
+  <script>
 const NODE_TYPES={
   battle:{name:"上课",glyph:"课",detail:"战斗节点"},exam:{name:"月考",glyph:"月",detail:"精英战斗节点"},dorm:{name:"宿舍",glyph:"舍",detail:"休整节点"},
   canteen:{name:"食堂",glyph:"食",detail:"采购节点"},
@@ -748,3 +1209,7 @@ $("claimRelic").addEventListener("click",()=>claimRelicReward(false));
 $("skipCardReward").addEventListener("click",()=>selectReward(null));
 $("skipRelicReward").addEventListener("click",()=>claimRelicReward(true));
 updateRealTime();setInterval(updateRealTime,1000);
+
+  </script>
+</body>
+</html>

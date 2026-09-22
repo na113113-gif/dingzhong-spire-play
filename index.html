@@ -2,10 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#10251f">
   <meta name="description" content="定州中学校园题材文字卡牌游戏地图原型">
-  <title>定中尖塔</title>
+  <title>定中尖塔 v0.0.2</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23112620'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='%23f5d06f' font-family='serif'%3E定%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="./style.css">
 </head>
@@ -20,7 +20,7 @@
       <div class="seal" aria-hidden="true">定</div>
       <p class="eyebrow">校园牌组构筑游戏</p>
       <h1 id="gameTitle">定中尖塔</h1>
-      <p class="chapter">v0.0.1 · 第一层 · 高一</p>
+      <p class="chapter">v0.0.2 · 第1层 · 高一</p>
       <form id="startForm" novalidate>
         <label class="id-field" for="playerId"><span>学生 ID</span><input id="playerId" name="playerId" maxlength="16" autocomplete="off" placeholder="输入你的 ID" aria-describedby="idHint"></label>
         <p id="idHint" class="field-hint">ID 仅用于本次游戏显示</p>
@@ -73,7 +73,8 @@
         <button id="inspectRelics" class="deck-button relic-detail-button" type="button">查看圣遗物详情</button>
       </aside>
       <section class="map-panel panel" aria-labelledby="mapTitle">
-        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1></div><button id="rerollMap" class="text-button" type="button">重新生成</button></div>
+        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1><p id="bossPreview" class="boss-preview"></p></div></div>
+        <p class="map-tip">由下向上前进 · 金色线可走 · 浅绿色线已走<br>触摸未解锁节点或悬停查看相连路线；点击亮起节点进入。</p>
         <div id="mapViewport" class="map-viewport">
           <div id="mapCanvas" class="map-canvas" aria-label="随机生成的一层路线地图">
             <svg id="routeLines" class="route-lines" aria-hidden="true"></svg>
@@ -93,7 +94,7 @@
           <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
           <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
         </ul>
-        <div class="placeholder-note"><strong>当前版本</strong><p>上课、月考、宿舍、食堂、超市与操场节点可交互。期末内容等待设计。</p></div>
+        <div class="placeholder-note"><strong>当前版本</strong><p>上课与月考各有3种敌人。期末随机生成主课＋文科、主课＋理科或主课＋体育的1种 Boss。</p></div>
       </aside>
     </div>
   </main>
@@ -173,7 +174,7 @@
 
   <main id="battleScreen" class="battle-screen" hidden>
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>上课 · 战斗节点</small></div></div>
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small id="battleNodeLabel">上课 · 战斗节点</small></div></div>
       <div class="route-title"><small id="battleEncounterTitle">随堂小测</small><strong id="battleTurn">第1回合</strong></div>
       <div class="battle-header-id">ID　<strong id="battlePlayerId"></strong></div>
     </header>
@@ -186,6 +187,7 @@
         <div class="status-bar"><i id="battleHpBar"></i></div>
         <div class="combat-values"><span>防御 <b id="battleBlock">0</b></span><span>思路增幅 <b id="nextAttackState">无</b></span><span>力量 <b id="battleStrength">0</b></span><span>敏捷 <b id="battleDexterity">0</b></span></div>
         <div id="powerList" class="power-list"><small>暂无天赋</small></div>
+        <div id="playerDebuffs" class="player-debuffs" aria-live="polite"></div>
       </aside>
 
       <section class="enemy-zone">
@@ -197,7 +199,7 @@
         <article id="quizEnemy" class="quiz-enemy">
           <p class="eyebrow">课堂挑战</p>
           <h1 id="quizTitle">随堂小测</h1>
-          <p>“请独立作答，答题过程计入成绩。”</p>
+          <p id="enemyDescription">请观察题型与敌人意图。</p>
           <div class="enemy-statuses"><span id="enemyThought" hidden>思路 <b>0</b></span><span id="enemyBlock" hidden>防御 <b>0</b></span></div>
           <div class="enemy-hp-row"><span>测验进度</span><div class="status-bar enemy"><i id="quizHpBar"></i></div><b id="quizHpText">52 / 52</b></div>
         </article>
@@ -208,7 +210,7 @@
       <aside class="combat-rules panel">
         <p class="eyebrow">战斗信息</p>
         <h2>意图始终可见</h2>
-        <p>随堂小测以攻击为主。根据下一步意图安排攻击与防御。</p>
+        <p>意图显示本回合攻击压力（已计入紧张，防御可抵挡）。减益在敌方行动后减少1回合，新施加的减益从下一玩家回合生效。</p>
         <dl>
           <div><dt>抽牌堆</dt><dd><button class="pile-view-button" data-pile="draw" type="button"><b id="battleDraw">10</b><small>查看</small></button></dd></div>
           <div><dt>弃牌堆</dt><dd><button class="pile-view-button" data-pile="discard" type="button"><b id="battleDiscard">0</b><small>查看</small></button></dd></div>
@@ -229,24 +231,26 @@
       <h1 id="rewardTitle">选择1张卡牌</h1>
       <p class="reward-copy">将选择的卡牌永久加入本次牌组。</p>
       <div id="rewardCards" class="reward-cards"></div>
+      <button id="skipCardReward" class="text-button reward-skip" type="button">跳过本次卡牌奖励</button>
       <div class="meal-reward"><span>本次获得饭卡价值</span><strong id="mealReward">0</strong></div>
     </section>
   </main>
 
   <main id="relicRewardScreen" class="reward-screen" hidden>
     <section class="reward-panel relic-reward-panel panel">
-      <p class="eyebrow">月考额外奖励</p>
+      <p class="eyebrow">考试额外奖励</p>
       <h1>获得1件圣遗物</h1>
       <div id="relicRewardCard" class="relic-reward-card"></div>
       <button id="claimRelic" class="primary-button" type="button">收下圣遗物</button>
+      <button id="skipRelicReward" class="text-button reward-skip" type="button">不拿圣遗物</button>
     </section>
   </main>
 
   <div id="finishModal" class="modal" hidden>
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
       <p class="eyebrow">第一层路线完成</p><h2 id="finishTitle">抵达期末节点</h2>
-      <p>Boss 内容尚未设计，本次地图演示到此结束。</p>
-      <button id="restartMap" class="primary-button" type="button">生成新路线</button>
+      <p id="finishSummary">你完成了本层期末考试。</p>
+      <button id="restartMap" class="primary-button" type="button">返回主界面</button>
     </section>
   </div>
 
@@ -307,7 +311,7 @@
   <div id="defeatModal" class="modal" hidden>
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="defeatTitle">
       <p class="eyebrow">专注耗尽</p><h2 id="defeatTitle">需要重新作答</h2>
-      <p>调整打防顺序，再挑战随堂小测。</p>
+      <p>调整打防顺序，重新挑战当前敌人。</p>
       <button id="retryBattle" class="primary-button" type="button">重新挑战</button>
     </section>
   </div>

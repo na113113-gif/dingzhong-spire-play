@@ -36,3 +36,106 @@
 .map-node.exam.available{background:#704028;border-color:#ffb266;box-shadow:0 0 0 5px #ff9b3d18,0 0 28px #ff8a3055}.node-sample.exam{background:#704028;border-color:#d99055}.run-relics{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.run-relics span{border:1px solid #d1aa5766;border-radius:99px;padding:5px 8px;color:#f0d28a;font-size:11px}.run-relics small{color:var(--muted)}.relic-reward-panel{max-width:560px}.relic-reward-card{margin:28px auto;width:min(380px,100%);padding:28px;border:1px solid #d1aa57;border-radius:13px;background:linear-gradient(145deg,#3e3019,#17140d);text-align:left}.relic-reward-card h2{font:700 27px serif;margin:8px 0}.relic-reward-card p{color:#d9c89d;line-height:1.7}.relic-reward-card small{color:var(--gold)}.shop-item.relic-item{border-color:#b69248;background:linear-gradient(145deg,#3b301c,#18150e)}.shop-item.colorless-card{border-color:#9a9a9a;background:linear-gradient(145deg,#424242,#202020)}.battle-card.colorless-card{background:linear-gradient(150deg,#ececec,#bdbdbd);border-color:#777}
 .relic-detail-button{margin-top:9px}.pile-view-button{width:100%;display:flex;align-items:end;justify-content:space-between;gap:5px;padding:0;border:0;background:transparent;color:var(--gold);cursor:pointer;text-align:left}.pile-view-button b{font:700 18px serif}.pile-view-button small{color:var(--muted);font-size:9px}.pile-view-button:hover small{color:var(--gold)}.collection-card{width:min(1040px,calc(100% - 32px));max-height:88vh;text-align:left;padding:26px}.collection-head{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:15px}.collection-head h2{margin:5px 0 0;text-align:left;font-size:27px}.collection-card>p{margin:14px 0 0;color:var(--muted);font-size:13px}.collection-grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:13px;max-height:62vh;overflow:auto;padding:18px 8px}.collection-grid .battle-card{width:100%;min-width:0;min-height:205px;cursor:default;filter:none}.collection-grid .battle-card:hover{transform:none;outline:0}.collection-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:32px}.relic-detail-grid{grid-template-columns:repeat(3,1fr)}.relic-detail-item{min-height:150px;padding:20px;border:1px solid #b69248;border-radius:11px;background:linear-gradient(145deg,#3b301c,#18150e)}.relic-detail-item small{color:var(--gold)}.relic-detail-item h3{font:700 20px serif;margin:8px 0}.relic-detail-item p{color:#d9c89d;font-size:13px;line-height:1.65;margin:0}
 @media(max-width:760px){.collection-grid{grid-template-columns:1fr 1fr;gap:9px}.relic-detail-grid{grid-template-columns:1fr}.collection-card{padding:18px 13px}.collection-head h2{font-size:21px}}
+
+.boss-preview{font-size:13px;color:var(--gold);margin:8px 0 0}
+.player-debuffs{display:grid;gap:6px;margin-top:10px;grid-column:1/-1}
+.player-debuffs:empty{display:none}
+.player-debuffs span{background:#482823;border:1px solid #a7675d;border-radius:6px;padding:7px;color:#ffcdc3;font-size:12px;line-height:1.5}
+.reward-skip{display:block;margin:16px auto;min-height:44px}
+#enemyDescription{line-height:1.6;font-size:14px}
+@media(min-width:761px){
+  .battle-screen{height:100vh;height:100dvh;min-height:0;display:grid;grid-template-rows:74px minmax(0,1fr) auto;overflow:hidden}
+  .battle-screen .battle-board{min-height:0;overflow:auto;align-items:start;padding:22px 20px;grid-template-columns:minmax(160px,210px) minmax(280px,600px) minmax(150px,210px);gap:16px}
+  .battle-screen .combat-rules{display:block}
+  .battle-screen .battle-desk{position:relative;bottom:auto;z-index:12;min-height:230px;max-height:45dvh;padding:10px 20px 14px;grid-template-columns:80px minmax(0,1fr) 120px;overflow:auto;box-shadow:0 -12px 35px #0006}
+  .battle-screen .battle-hand{justify-content:flex-start;padding:18px 10px 8px;min-width:0;align-items:stretch;scroll-padding:12px}
+  .battle-screen .battle-card{flex:0 0 144px;min-height:195px}
+  .battle-screen .battle-card .card-text{font-size:13px}
+  .battle-screen .quiz-enemy{padding:18px}
+  .battle-screen .quiz-enemy h1{font-size:32px}
+  .battle-screen .game-clock{pointer-events:none}
+}
+/* Route geometry uses the same independent X/Y scaling as the node layer. */
+.route-line{stroke:#668b7d;stroke-width:2.5;stroke-dasharray:none;opacity:.7;stroke-linecap:round}
+.route-line.available{stroke:#ffda77;stroke-width:4;opacity:1}
+.route-line.visited{stroke:#91c6b0;stroke-width:3;opacity:.9}
+.route-arrow{fill:none;stroke:#90b5a5;stroke-width:2;vector-effect:non-scaling-stroke;pointer-events:none}
+.route-arrow.available{stroke:#ffda77;stroke-width:3}
+.route-arrow.visited{stroke:#91c6b0}
+.map-node small{background:#091914ed;border:1px solid #426458;border-radius:5px;padding:3px 2px;color:#cfdfd7;white-space:nowrap;pointer-events:none}
+.map-node.available small{color:#ffda77;border-color:#b69849}
+.map-node.locked{cursor:pointer}
+.map-node.current small{color:#ffda77}
+.route-inspecting .route-line,.route-inspecting .route-arrow{opacity:.13}
+.route-inspecting .map-node:not(.route-focused){opacity:.35}
+.route-inspecting .route-line.route-focused,.route-inspecting .route-arrow.route-focused{stroke:#fff0b6;opacity:1;stroke-width:4}
+.map-node.route-focused{outline:2px solid #fff0b6;outline-offset:4px}
+/* 手机竖屏：把主要操作压进拇指可达区域，并保留所有战斗信息入口。 */
+@media (orientation:portrait) and (max-width:760px){
+  html{min-width:320px;overflow-x:hidden}
+  body{min-width:320px;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom)}
+  button{min-height:44px;touch-action:manipulation}
+  .start-screen,.map-screen,.node-screen,.battle-screen,.reward-screen{min-height:100dvh}
+  .start-screen{display:block;padding:max(18px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom));overflow:auto}
+  .start-card{width:calc(100vw - 24px);max-width:calc(100vw - 24px);margin:0 auto;padding:22px 15px;border-radius:14px}
+  .seal{width:52px;height:52px;font-size:29px;margin-bottom:8px}
+  .start-card>h1{font-size:36px;margin-top:4px}
+  .chapter{margin-bottom:19px;font-size:13px}
+  .id-field{grid-template-columns:72px 1fr;padding-left:9px}
+  .id-field input{min-width:0;padding:13px 11px;font-size:16px}
+  .field-hint{margin:6px 0 17px 84px}
+  .role-card{grid-template-columns:42px minmax(0,1fr);min-height:88px;padding:12px;gap:10px;overflow:hidden}
+  .role-card .chosen{display:none}
+  .role-copy{min-width:0;max-width:100%}.role-copy strong{font-size:16px}.role-copy em{display:block;max-width:100%;font-size:12px;line-height:1.45;white-space:normal;overflow-wrap:anywhere;word-break:break-all}
+
+  .topbar{height:58px;padding:env(safe-area-inset-top) 10px 0;grid-template-columns:1fr auto}
+  .brand{gap:7px}.brand-mark{width:34px;height:34px;font-size:20px}.brand strong{font-size:15px}.brand small{display:none}
+  .topbar>.text-button{min-height:38px;padding:7px 10px;font-size:12px}
+  .game-clock{top:4px;left:50%;right:auto;transform:translateX(-50%);width:90px;padding:5px;border:0;background:transparent;box-shadow:none;text-align:center;z-index:22}
+  .game-clock span,.game-clock small{display:none}.game-clock strong{font-size:15px;color:var(--gold)}
+
+  .map-layout{display:flex;flex-direction:column;gap:8px;padding:8px}
+  .profile-panel{position:static;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:11px}
+  .profile-head{min-width:0}.profile-head strong{max-width:115px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .profile-panel h2,.deck-note,.run-relics{display:none}
+  .profile-panel .status-line{align-self:end;margin:0}.profile-panel>.status-bar{grid-column:2}
+  .run-stats{grid-column:1/-1;grid-template-columns:repeat(4,1fr);gap:5px;margin:2px 0}
+  .run-stats div{padding:7px 4px;text-align:center}.run-stats dt{font-size:10px}.run-stats dd{font-size:15px;margin-top:2px}
+  .profile-panel .deck-button{margin:0;padding:8px 5px;min-height:40px;font-size:12px}
+  .map-panel{width:100%}.map-heading{min-height:62px;padding:10px 12px}.map-heading h1{font-size:19px}.map-heading .text-button{min-height:38px;padding:7px 9px}
+  .map-viewport{height:calc(100dvh - 300px);min-height:380px;overscroll-behavior:contain}
+  .map-canvas{min-width:340px}.map-node{width:48px;height:48px}.map-node small{top:51px;font-size:10px}.map-node.boss{width:58px;height:58px}.map-node.boss small{top:63px}
+  .map-tip{padding:9px 12px;font-size:11px}
+
+  .node-stage,.shop-stage,.sport-stage{width:calc(100% - 20px);padding:25px 0 34px}
+  .node-intro{margin-bottom:18px}.node-intro h1,.shop-heading h1{font-size:29px}.node-intro>p:last-child{font-size:13px}
+  .choice-grid,.sport-choice-grid{grid-template-columns:1fr;gap:12px}
+  .choice-card,.sport-choice{min-height:auto;padding:23px 19px}.choice-card .choice-mark{width:54px;height:54px;font-size:27px;margin-bottom:15px}.choice-card h2{font-size:25px;margin:7px 0 12px}.choice-card p:not(.eyebrow){min-height:0;font-size:14px}.choice-card .primary-button{margin-top:18px}
+  .shop-heading{align-items:flex-start}.shop-heading>p{display:none}.shop-section{margin-top:22px}.card-goods,.compact-goods{grid-template-columns:1fr}.shop-item,.card-goods .shop-item{min-height:auto}.binge-panel{margin-top:22px;padding:18px;align-items:stretch;flex-direction:column}.binge-panel .primary-button{width:100%;min-width:0}
+  .event-stage{min-height:calc(100dvh - 58px);padding:12px}.event-card{padding:28px 18px}.event-card h1{font-size:28px}.event-card>p:not(.eyebrow){font-size:14px}
+
+  .battle-board{display:block;min-height:auto;padding:8px 8px 0}
+  .combatant-panel{display:grid;grid-template-columns:auto 1fr;gap:6px;margin-bottom:7px;padding:9px 11px}
+  .combatant-panel .eyebrow,.combatant-panel h2{display:none}.combatant-panel .status-line{align-self:end;margin:0}.combatant-panel .status-bar{grid-column:2}.combat-values{grid-column:1/-1;margin-top:0;gap:5px}.combat-values span{padding:6px;font-size:11px}.combat-values b{display:inline;margin:0 0 0 5px;font-size:15px}.power-list{grid-column:1/-1;min-height:0;margin:0}
+  .intent-card{min-width:0;width:100%;margin-bottom:7px;padding:7px 10px}.intent-card strong{font-size:15px}.intent-card p{font-size:12px}
+  .quiz-enemy{padding:13px 15px}.quiz-enemy h1{font-size:27px;margin:5px 0}.quiz-enemy>p:not(.eyebrow){font-size:12px;margin:5px}.enemy-statuses{margin:7px 0;min-height:26px}.enemy-hp-row{gap:6px}
+  .battle-log{height:auto;min-height:18px;margin:7px 0;font-size:11px}
+  .combat-rules{display:block!important;margin-top:7px;padding:7px;background:#091914ed}
+  .combat-rules>.eyebrow,.combat-rules>h2,.combat-rules>p{display:none}.combat-rules dl{grid-template-columns:repeat(3,1fr);gap:5px;margin:0}.combat-rules dl div{padding:6px}.combat-rules dt{font-size:10px}.combat-rules dd{margin-top:2px}.pile-view-button{min-height:30px}.pile-view-button b{font-size:16px}.pile-view-button small{font-size:10px}
+  .battle-desk{position:sticky;bottom:0;z-index:12;grid-template-columns:58px 1fr 86px;grid-template-rows:auto auto;gap:6px;min-height:0;padding:7px 8px max(8px,env(safe-area-inset-bottom));align-items:center;box-shadow:0 -10px 30px #0009}
+  .energy-orb{grid-column:1;grid-row:1;align-self:center}.energy-orb strong{width:48px;height:48px;font-size:22px}.energy-orb small{display:none}
+  .end-turn{grid-column:3;grid-row:1;width:86px;justify-self:end;padding:9px 6px}.end-turn strong{font-size:13px}.end-turn span{display:none}
+  .battle-hand{grid-column:1/-1;grid-row:2;justify-content:flex-start;gap:7px;padding:8px 3px 4px;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+  .battle-hand .battle-card{scroll-snap-align:center;width:112px;min-width:112px;min-height:158px;padding:12px 9px 8px}.battle-card .card-meta{margin-bottom:11px}.battle-card h3{font-size:15px;margin-bottom:8px}.battle-card .card-text{font-size:11px;line-height:1.4}
+
+  .reward-screen{display:block;padding:12px}.reward-panel{padding:22px 13px}.reward-panel h1{font-size:28px}.reward-cards{grid-template-columns:1fr;gap:12px;margin:18px 0;max-height:none;overflow:visible}.reward-option{grid-template-columns:1fr auto;gap:8px}.reward-option .battle-card{min-height:170px}.reward-option button:last-child{width:92px;padding:9px}
+  .modal{align-items:end;padding-top:env(safe-area-inset-top)}.modal-card,.selection-card,.deck-view-card,.collection-card{width:100%;max-height:90dvh;margin:0;padding:19px 13px max(18px,env(safe-area-inset-bottom));border-left:0;border-right:0;border-bottom:0;border-radius:16px 16px 0 0;overflow:auto}
+  .deck-view-head,.collection-head{position:sticky;top:-19px;z-index:2;background:#112820;padding:12px 0}.deck-view-tools{padding:11px 0}.deck-view-grid,.collection-grid{grid-template-columns:1fr 1fr;gap:8px;max-height:none;padding:8px 2px}.deck-view-grid .battle-card,.collection-grid .battle-card{min-height:174px}.relic-detail-grid{grid-template-columns:1fr}.selection-cards{padding:10px 2px}.selection-cards .battle-card{min-width:116px}.selection-actions{position:sticky;bottom:0;background:#112820;padding-top:8px}
+}
+
+@media (orientation:portrait) and (max-width:380px){
+  .run-stats{grid-template-columns:repeat(3,1fr)}
+  .map-viewport{height:calc(100dvh - 335px);min-height:345px}
+  .deck-view-grid,.collection-grid{grid-template-columns:1fr 1fr}
+  .deck-view-grid .battle-card,.collection-grid .battle-card{min-height:164px;padding:11px 8px}
+}

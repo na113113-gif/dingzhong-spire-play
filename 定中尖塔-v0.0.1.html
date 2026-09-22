@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#10251f">
   <meta name="description" content="定州中学校园题材文字卡牌游戏地图原型">
   <title>定中尖塔 v0.0.1 · 单文件版</title>
@@ -46,6 +46,109 @@
 .map-node.exam.available{background:#704028;border-color:#ffb266;box-shadow:0 0 0 5px #ff9b3d18,0 0 28px #ff8a3055}.node-sample.exam{background:#704028;border-color:#d99055}.run-relics{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.run-relics span{border:1px solid #d1aa5766;border-radius:99px;padding:5px 8px;color:#f0d28a;font-size:11px}.run-relics small{color:var(--muted)}.relic-reward-panel{max-width:560px}.relic-reward-card{margin:28px auto;width:min(380px,100%);padding:28px;border:1px solid #d1aa57;border-radius:13px;background:linear-gradient(145deg,#3e3019,#17140d);text-align:left}.relic-reward-card h2{font:700 27px serif;margin:8px 0}.relic-reward-card p{color:#d9c89d;line-height:1.7}.relic-reward-card small{color:var(--gold)}.shop-item.relic-item{border-color:#b69248;background:linear-gradient(145deg,#3b301c,#18150e)}.shop-item.colorless-card{border-color:#9a9a9a;background:linear-gradient(145deg,#424242,#202020)}.battle-card.colorless-card{background:linear-gradient(150deg,#ececec,#bdbdbd);border-color:#777}
 .relic-detail-button{margin-top:9px}.pile-view-button{width:100%;display:flex;align-items:end;justify-content:space-between;gap:5px;padding:0;border:0;background:transparent;color:var(--gold);cursor:pointer;text-align:left}.pile-view-button b{font:700 18px serif}.pile-view-button small{color:var(--muted);font-size:9px}.pile-view-button:hover small{color:var(--gold)}.collection-card{width:min(1040px,calc(100% - 32px));max-height:88vh;text-align:left;padding:26px}.collection-head{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:15px}.collection-head h2{margin:5px 0 0;text-align:left;font-size:27px}.collection-card>p{margin:14px 0 0;color:var(--muted);font-size:13px}.collection-grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:13px;max-height:62vh;overflow:auto;padding:18px 8px}.collection-grid .battle-card{width:100%;min-width:0;min-height:205px;cursor:default;filter:none}.collection-grid .battle-card:hover{transform:none;outline:0}.collection-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:32px}.relic-detail-grid{grid-template-columns:repeat(3,1fr)}.relic-detail-item{min-height:150px;padding:20px;border:1px solid #b69248;border-radius:11px;background:linear-gradient(145deg,#3b301c,#18150e)}.relic-detail-item small{color:var(--gold)}.relic-detail-item h3{font:700 20px serif;margin:8px 0}.relic-detail-item p{color:#d9c89d;font-size:13px;line-height:1.65;margin:0}
 @media(max-width:760px){.collection-grid{grid-template-columns:1fr 1fr;gap:9px}.relic-detail-grid{grid-template-columns:1fr}.collection-card{padding:18px 13px}.collection-head h2{font-size:21px}}
+
+.boss-preview{font-size:13px;color:var(--gold);margin:8px 0 0}
+.player-debuffs{display:grid;gap:6px;margin-top:10px;grid-column:1/-1}
+.player-debuffs:empty{display:none}
+.player-debuffs span{background:#482823;border:1px solid #a7675d;border-radius:6px;padding:7px;color:#ffcdc3;font-size:12px;line-height:1.5}
+.reward-skip{display:block;margin:16px auto;min-height:44px}
+#enemyDescription{line-height:1.6;font-size:14px}
+@media(min-width:761px){
+  .battle-screen{height:100vh;height:100dvh;min-height:0;display:grid;grid-template-rows:74px minmax(0,1fr) auto;overflow:hidden}
+  .battle-screen .battle-board{min-height:0;overflow:auto;align-items:start;padding:22px 20px;grid-template-columns:minmax(160px,210px) minmax(280px,600px) minmax(150px,210px);gap:16px}
+  .battle-screen .combat-rules{display:block}
+  .battle-screen .battle-desk{position:relative;bottom:auto;z-index:12;min-height:230px;max-height:45dvh;padding:10px 20px 14px;grid-template-columns:80px minmax(0,1fr) 120px;overflow:auto;box-shadow:0 -12px 35px #0006}
+  .battle-screen .battle-hand{justify-content:flex-start;padding:18px 10px 8px;min-width:0;align-items:stretch;scroll-padding:12px}
+  .battle-screen .battle-card{flex:0 0 144px;min-height:195px}
+  .battle-screen .battle-card .card-text{font-size:13px}
+  .battle-screen .quiz-enemy{padding:18px}
+  .battle-screen .quiz-enemy h1{font-size:32px}
+  .battle-screen .game-clock{pointer-events:none}
+}
+/* Route geometry uses the same independent X/Y scaling as the node layer. */
+.route-line{stroke:#668b7d;stroke-width:2.5;stroke-dasharray:none;opacity:.7;stroke-linecap:round}
+.route-line.available{stroke:#ffda77;stroke-width:4;opacity:1}
+.route-line.visited{stroke:#91c6b0;stroke-width:3;opacity:.9}
+.route-arrow{fill:none;stroke:#90b5a5;stroke-width:2;vector-effect:non-scaling-stroke;pointer-events:none}
+.route-arrow.available{stroke:#ffda77;stroke-width:3}
+.route-arrow.visited{stroke:#91c6b0}
+.map-node small{background:#091914ed;border:1px solid #426458;border-radius:5px;padding:3px 2px;color:#cfdfd7;white-space:nowrap;pointer-events:none}
+.map-node.available small{color:#ffda77;border-color:#b69849}
+.map-node.locked{cursor:pointer}
+.map-node.current small{color:#ffda77}
+.route-inspecting .route-line,.route-inspecting .route-arrow{opacity:.13}
+.route-inspecting .map-node:not(.route-focused){opacity:.35}
+.route-inspecting .route-line.route-focused,.route-inspecting .route-arrow.route-focused{stroke:#fff0b6;opacity:1;stroke-width:4}
+.map-node.route-focused{outline:2px solid #fff0b6;outline-offset:4px}
+/* 手机竖屏：把主要操作压进拇指可达区域，并保留所有战斗信息入口。 */
+@media (orientation:portrait) and (max-width:760px){
+  html{min-width:320px;overflow-x:hidden}
+  body{min-width:320px;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom)}
+  button{min-height:44px;touch-action:manipulation}
+  .start-screen,.map-screen,.node-screen,.battle-screen,.reward-screen{min-height:100dvh}
+  .start-screen{display:block;padding:max(18px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom));overflow:auto}
+  .start-card{width:calc(100vw - 24px);max-width:calc(100vw - 24px);margin:0 auto;padding:22px 15px;border-radius:14px}
+  .seal{width:52px;height:52px;font-size:29px;margin-bottom:8px}
+  .start-card>h1{font-size:36px;margin-top:4px}
+  .chapter{margin-bottom:19px;font-size:13px}
+  .id-field{grid-template-columns:72px 1fr;padding-left:9px}
+  .id-field input{min-width:0;padding:13px 11px;font-size:16px}
+  .field-hint{margin:6px 0 17px 84px}
+  .role-card{grid-template-columns:42px minmax(0,1fr);min-height:88px;padding:12px;gap:10px;overflow:hidden}
+  .role-card .chosen{display:none}
+  .role-copy{min-width:0;max-width:100%}.role-copy strong{font-size:16px}.role-copy em{display:block;max-width:100%;font-size:12px;line-height:1.45;white-space:normal;overflow-wrap:anywhere;word-break:break-all}
+
+  .topbar{height:58px;padding:env(safe-area-inset-top) 10px 0;grid-template-columns:1fr auto}
+  .brand{gap:7px}.brand-mark{width:34px;height:34px;font-size:20px}.brand strong{font-size:15px}.brand small{display:none}
+  .topbar>.text-button{min-height:38px;padding:7px 10px;font-size:12px}
+  .game-clock{top:4px;left:50%;right:auto;transform:translateX(-50%);width:90px;padding:5px;border:0;background:transparent;box-shadow:none;text-align:center;z-index:22}
+  .game-clock span,.game-clock small{display:none}.game-clock strong{font-size:15px;color:var(--gold)}
+
+  .map-layout{display:flex;flex-direction:column;gap:8px;padding:8px}
+  .profile-panel{position:static;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:11px}
+  .profile-head{min-width:0}.profile-head strong{max-width:115px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .profile-panel h2,.deck-note,.run-relics{display:none}
+  .profile-panel .status-line{align-self:end;margin:0}.profile-panel>.status-bar{grid-column:2}
+  .run-stats{grid-column:1/-1;grid-template-columns:repeat(4,1fr);gap:5px;margin:2px 0}
+  .run-stats div{padding:7px 4px;text-align:center}.run-stats dt{font-size:10px}.run-stats dd{font-size:15px;margin-top:2px}
+  .profile-panel .deck-button{margin:0;padding:8px 5px;min-height:40px;font-size:12px}
+  .map-panel{width:100%}.map-heading{min-height:62px;padding:10px 12px}.map-heading h1{font-size:19px}.map-heading .text-button{min-height:38px;padding:7px 9px}
+  .map-viewport{height:calc(100dvh - 300px);min-height:380px;overscroll-behavior:contain}
+  .map-canvas{min-width:340px}.map-node{width:48px;height:48px}.map-node small{top:51px;font-size:10px}.map-node.boss{width:58px;height:58px}.map-node.boss small{top:63px}
+  .map-tip{padding:9px 12px;font-size:11px}
+
+  .node-stage,.shop-stage,.sport-stage{width:calc(100% - 20px);padding:25px 0 34px}
+  .node-intro{margin-bottom:18px}.node-intro h1,.shop-heading h1{font-size:29px}.node-intro>p:last-child{font-size:13px}
+  .choice-grid,.sport-choice-grid{grid-template-columns:1fr;gap:12px}
+  .choice-card,.sport-choice{min-height:auto;padding:23px 19px}.choice-card .choice-mark{width:54px;height:54px;font-size:27px;margin-bottom:15px}.choice-card h2{font-size:25px;margin:7px 0 12px}.choice-card p:not(.eyebrow){min-height:0;font-size:14px}.choice-card .primary-button{margin-top:18px}
+  .shop-heading{align-items:flex-start}.shop-heading>p{display:none}.shop-section{margin-top:22px}.card-goods,.compact-goods{grid-template-columns:1fr}.shop-item,.card-goods .shop-item{min-height:auto}.binge-panel{margin-top:22px;padding:18px;align-items:stretch;flex-direction:column}.binge-panel .primary-button{width:100%;min-width:0}
+  .event-stage{min-height:calc(100dvh - 58px);padding:12px}.event-card{padding:28px 18px}.event-card h1{font-size:28px}.event-card>p:not(.eyebrow){font-size:14px}
+
+  .battle-board{display:block;min-height:auto;padding:8px 8px 0}
+  .combatant-panel{display:grid;grid-template-columns:auto 1fr;gap:6px;margin-bottom:7px;padding:9px 11px}
+  .combatant-panel .eyebrow,.combatant-panel h2{display:none}.combatant-panel .status-line{align-self:end;margin:0}.combatant-panel .status-bar{grid-column:2}.combat-values{grid-column:1/-1;margin-top:0;gap:5px}.combat-values span{padding:6px;font-size:11px}.combat-values b{display:inline;margin:0 0 0 5px;font-size:15px}.power-list{grid-column:1/-1;min-height:0;margin:0}
+  .intent-card{min-width:0;width:100%;margin-bottom:7px;padding:7px 10px}.intent-card strong{font-size:15px}.intent-card p{font-size:12px}
+  .quiz-enemy{padding:13px 15px}.quiz-enemy h1{font-size:27px;margin:5px 0}.quiz-enemy>p:not(.eyebrow){font-size:12px;margin:5px}.enemy-statuses{margin:7px 0;min-height:26px}.enemy-hp-row{gap:6px}
+  .battle-log{height:auto;min-height:18px;margin:7px 0;font-size:11px}
+  .combat-rules{display:block!important;margin-top:7px;padding:7px;background:#091914ed}
+  .combat-rules>.eyebrow,.combat-rules>h2,.combat-rules>p{display:none}.combat-rules dl{grid-template-columns:repeat(3,1fr);gap:5px;margin:0}.combat-rules dl div{padding:6px}.combat-rules dt{font-size:10px}.combat-rules dd{margin-top:2px}.pile-view-button{min-height:30px}.pile-view-button b{font-size:16px}.pile-view-button small{font-size:10px}
+  .battle-desk{position:sticky;bottom:0;z-index:12;grid-template-columns:58px 1fr 86px;grid-template-rows:auto auto;gap:6px;min-height:0;padding:7px 8px max(8px,env(safe-area-inset-bottom));align-items:center;box-shadow:0 -10px 30px #0009}
+  .energy-orb{grid-column:1;grid-row:1;align-self:center}.energy-orb strong{width:48px;height:48px;font-size:22px}.energy-orb small{display:none}
+  .end-turn{grid-column:3;grid-row:1;width:86px;justify-self:end;padding:9px 6px}.end-turn strong{font-size:13px}.end-turn span{display:none}
+  .battle-hand{grid-column:1/-1;grid-row:2;justify-content:flex-start;gap:7px;padding:8px 3px 4px;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+  .battle-hand .battle-card{scroll-snap-align:center;width:112px;min-width:112px;min-height:158px;padding:12px 9px 8px}.battle-card .card-meta{margin-bottom:11px}.battle-card h3{font-size:15px;margin-bottom:8px}.battle-card .card-text{font-size:11px;line-height:1.4}
+
+  .reward-screen{display:block;padding:12px}.reward-panel{padding:22px 13px}.reward-panel h1{font-size:28px}.reward-cards{grid-template-columns:1fr;gap:12px;margin:18px 0;max-height:none;overflow:visible}.reward-option{grid-template-columns:1fr auto;gap:8px}.reward-option .battle-card{min-height:170px}.reward-option button:last-child{width:92px;padding:9px}
+  .modal{align-items:end;padding-top:env(safe-area-inset-top)}.modal-card,.selection-card,.deck-view-card,.collection-card{width:100%;max-height:90dvh;margin:0;padding:19px 13px max(18px,env(safe-area-inset-bottom));border-left:0;border-right:0;border-bottom:0;border-radius:16px 16px 0 0;overflow:auto}
+  .deck-view-head,.collection-head{position:sticky;top:-19px;z-index:2;background:#112820;padding:12px 0}.deck-view-tools{padding:11px 0}.deck-view-grid,.collection-grid{grid-template-columns:1fr 1fr;gap:8px;max-height:none;padding:8px 2px}.deck-view-grid .battle-card,.collection-grid .battle-card{min-height:174px}.relic-detail-grid{grid-template-columns:1fr}.selection-cards{padding:10px 2px}.selection-cards .battle-card{min-width:116px}.selection-actions{position:sticky;bottom:0;background:#112820;padding-top:8px}
+}
+
+@media (orientation:portrait) and (max-width:380px){
+  .run-stats{grid-template-columns:repeat(3,1fr)}
+  .map-viewport{height:calc(100dvh - 335px);min-height:345px}
+  .deck-view-grid,.collection-grid{grid-template-columns:1fr 1fr}
+  .deck-view-grid .battle-card,.collection-grid .battle-card{min-height:164px;padding:11px 8px}
+}
 
   </style>
 </head>
@@ -113,7 +216,8 @@
         <button id="inspectRelics" class="deck-button relic-detail-button" type="button">查看圣遗物详情</button>
       </aside>
       <section class="map-panel panel" aria-labelledby="mapTitle">
-        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1></div><button id="rerollMap" class="text-button" type="button">重新生成</button></div>
+        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1><p id="bossPreview" class="boss-preview"></p></div></div>
+        <p class="map-tip">由下向上前进 · 金色线可走 · 浅绿色线已走<br>触摸未解锁节点或悬停查看相连路线；点击亮起节点进入。</p>
         <div id="mapViewport" class="map-viewport">
           <div id="mapCanvas" class="map-canvas" aria-label="随机生成的一层路线地图">
             <svg id="routeLines" class="route-lines" aria-hidden="true"></svg>
@@ -133,7 +237,7 @@
           <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
           <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
         </ul>
-        <div class="placeholder-note"><strong>当前版本</strong><p>上课、月考、宿舍、食堂、超市与操场节点可交互。期末内容等待设计。</p></div>
+        <div class="placeholder-note"><strong>当前版本</strong><p>上课与月考各有3种敌人。期末随机生成主课＋文科、主课＋理科或主课＋体育的1种 Boss。</p></div>
       </aside>
     </div>
   </main>
@@ -213,7 +317,7 @@
 
   <main id="battleScreen" class="battle-screen" hidden>
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>上课 · 战斗节点</small></div></div>
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small id="battleNodeLabel">上课 · 战斗节点</small></div></div>
       <div class="route-title"><small id="battleEncounterTitle">随堂小测</small><strong id="battleTurn">第1回合</strong></div>
       <div class="battle-header-id">ID　<strong id="battlePlayerId"></strong></div>
     </header>
@@ -226,6 +330,7 @@
         <div class="status-bar"><i id="battleHpBar"></i></div>
         <div class="combat-values"><span>防御 <b id="battleBlock">0</b></span><span>思路增幅 <b id="nextAttackState">无</b></span><span>力量 <b id="battleStrength">0</b></span><span>敏捷 <b id="battleDexterity">0</b></span></div>
         <div id="powerList" class="power-list"><small>暂无天赋</small></div>
+        <div id="playerDebuffs" class="player-debuffs" aria-live="polite"></div>
       </aside>
 
       <section class="enemy-zone">
@@ -237,7 +342,7 @@
         <article id="quizEnemy" class="quiz-enemy">
           <p class="eyebrow">课堂挑战</p>
           <h1 id="quizTitle">随堂小测</h1>
-          <p>“请独立作答，答题过程计入成绩。”</p>
+          <p id="enemyDescription">请观察题型与敌人意图。</p>
           <div class="enemy-statuses"><span id="enemyThought" hidden>思路 <b>0</b></span><span id="enemyBlock" hidden>防御 <b>0</b></span></div>
           <div class="enemy-hp-row"><span>测验进度</span><div class="status-bar enemy"><i id="quizHpBar"></i></div><b id="quizHpText">52 / 52</b></div>
         </article>
@@ -248,7 +353,7 @@
       <aside class="combat-rules panel">
         <p class="eyebrow">战斗信息</p>
         <h2>意图始终可见</h2>
-        <p>随堂小测以攻击为主。根据下一步意图安排攻击与防御。</p>
+        <p>意图显示本回合攻击压力（已计入紧张，防御可抵挡）。减益在敌方行动后减少1回合，新施加的减益从下一玩家回合生效。</p>
         <dl>
           <div><dt>抽牌堆</dt><dd><button class="pile-view-button" data-pile="draw" type="button"><b id="battleDraw">10</b><small>查看</small></button></dd></div>
           <div><dt>弃牌堆</dt><dd><button class="pile-view-button" data-pile="discard" type="button"><b id="battleDiscard">0</b><small>查看</small></button></dd></div>
@@ -269,24 +374,26 @@
       <h1 id="rewardTitle">选择1张卡牌</h1>
       <p class="reward-copy">将选择的卡牌永久加入本次牌组。</p>
       <div id="rewardCards" class="reward-cards"></div>
+      <button id="skipCardReward" class="text-button reward-skip" type="button">跳过本次卡牌奖励</button>
       <div class="meal-reward"><span>本次获得饭卡价值</span><strong id="mealReward">0</strong></div>
     </section>
   </main>
 
   <main id="relicRewardScreen" class="reward-screen" hidden>
     <section class="reward-panel relic-reward-panel panel">
-      <p class="eyebrow">月考额外奖励</p>
+      <p class="eyebrow">考试额外奖励</p>
       <h1>获得1件圣遗物</h1>
       <div id="relicRewardCard" class="relic-reward-card"></div>
       <button id="claimRelic" class="primary-button" type="button">收下圣遗物</button>
+      <button id="skipRelicReward" class="text-button reward-skip" type="button">不拿圣遗物</button>
     </section>
   </main>
 
   <div id="finishModal" class="modal" hidden>
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
       <p class="eyebrow">第一层路线完成</p><h2 id="finishTitle">抵达期末节点</h2>
-      <p>Boss 内容尚未设计，本次地图演示到此结束。</p>
-      <button id="restartMap" class="primary-button" type="button">生成新路线</button>
+      <p id="finishSummary">你完成了本层期末考试。</p>
+      <button id="restartMap" class="primary-button" type="button">返回主界面</button>
     </section>
   </div>
 
@@ -347,7 +454,7 @@
   <div id="defeatModal" class="modal" hidden>
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="defeatTitle">
       <p class="eyebrow">专注耗尽</p><h2 id="defeatTitle">需要重新作答</h2>
-      <p>调整打防顺序，再挑战随堂小测。</p>
+      <p>调整打防顺序，重新挑战当前敌人。</p>
       <button id="retryBattle" class="primary-button" type="button">重新挑战</button>
     </section>
   </div>
@@ -453,6 +560,19 @@ const EXAM_INTENTS=[
   {name:"压轴综合",damage:20,hits:1,text:"造成20点压力"}
 ];
 const ROWS=12,ROW_GAP=126,CANVAS_PAD=82;
+const DEBUFFS={weak:{name:"分心",text:"攻击伤害降低25%"},frail:{name:"疲惫",text:"卡牌获得的防御降低25%"},vulnerable:{name:"紧张",text:"受到的攻击伤害增加50%"}};
+const ENCOUNTERS={
+  quiz:{kind:"battle",name:"随堂小测",hp:52,note:"基础题与连续小问交替，检查回合会让你分心。",moves:[{name:"基础题",damage:6,hits:1},{name:"连续小问",damage:4,hits:2},{name:"重点检查",block:6,debuff:"weak",stacks:1},{name:"压轴小题",damage:12,hits:1}]},
+  board:{kind:"battle",name:"板书追击",hp:48,note:"先擦板设防，再用连写题施加疲惫，最后集中提问。",moves:[{name:"擦板备课",block:9},{name:"连写不停",damage:3,hits:3,debuff:"frail",stacks:1},{name:"突然提问",damage:11,hits:1}]},
+  dictation:{kind:"battle",name:"突击默写",hp:46,note:"抽查让你紧张，下回合的连续默写会利用紧张增伤。",moves:[{name:"随机点名",damage:4,hits:1,debuff:"vulnerable",stacks:1},{name:"连续默写",damage:4,hits:2},{name:"核对答案",block:8,debuff:"weak",stacks:1}]},
+  exam_chain:{kind:"exam",name:"月考·连问主考",hp:88,note:"多段攻击。预备卷先设防，追问叠加紧张，压轴集中爆发。",moves:[{name:"预备卷",damage:7,hits:1,block:8},{name:"步步追问",damage:4,hits:3,debuff:"vulnerable",stacks:1},{name:"压轴连问",damage:6,hits:3},{name:"回收答卷",block:12,debuff:"weak",stacks:1}]},
+  exam_wall:{kind:"exam",name:"月考·铁壁审题官",hp:100,note:"高防御。封卷阶段适合积累思路，留意疲惫后的重击。",moves:[{name:"严密审题",block:16,debuff:"frail",stacks:2},{name:"扣分红笔",damage:13,hits:1,block:5},{name:"封卷复查",block:12},{name:"一锤定分",damage:20,hits:1}]},
+  exam_clock:{kind:"exam",name:"月考·倒计时监考",hp:82,note:"施加分心和紧张。倒计时之后必定收卷，抓住整理考场的空档。",moves:[{name:"巡场提醒",damage:8,hits:1,debuff:"weak",stacks:1},{name:"最后倒计时",block:8,debuff:"vulnerable",stacks:1},{name:"强制收卷",damage:16,hits:1},{name:"整理考场",block:10,debuff:"frail",stacks:1}]},
+  boss_wen:{kind:"boss",name:"期末·文海长卷",hp:140,growth:1,note:"主课＋文科：阅读设防、论述施加分心、材料题制造紧张，作文收束爆发。每轮循环每段攻击增加1。",moves:[{name:"主课·基础统考",damage:10,hits:1},{name:"文科·阅读壁垒",block:16,debuff:"weak",stacks:2},{name:"主课·材料连问",damage:5,hits:2,debuff:"vulnerable",stacks:1},{name:"文科·长篇论述",damage:18,hits:1},{name:"阅卷间隙",block:8}]},
+  boss_li:{kind:"boss",name:"期末·压轴演算核心",hp:155,growth:1,note:"主课＋理科：模型构建获得高防御，推导叠加疲惫，蓄力后释放压轴证明。每轮循环每段攻击增加1。",moves:[{name:"主课·基础运算",damage:6,hits:2},{name:"理科·模型构建",block:20},{name:"主课·连锁推导",damage:10,hits:1,debuff:"frail",stacks:2},{name:"理科·证明蓄力",block:10},{name:"理科·压轴证明",damage:26,hits:1}]},
+  boss_sport:{kind:"boss",name:"期末·全能体测官",hp:130,growth:1,note:"主课＋体育：体能连击配合疲惫，口试制造紧张后发动冲刺，调整呼吸是反击窗口。每轮循环每段攻击增加1。",moves:[{name:"主课·口试点名",damage:8,hits:1,debuff:"vulnerable",stacks:1},{name:"体育·折返冲刺",damage:4,hits:4},{name:"体育·耐力加练",damage:7,hits:1,debuff:"frail",stacks:2},{name:"调整呼吸",block:14},{name:"主课·终点抢答",damage:18,hits:1}]}
+};
+function rollEncounter(kind){const ids=Object.keys(ENCOUNTERS).filter(id=>ENCOUNTERS[id].kind===kind);return ids[Math.floor(Math.random()*ids.length)]}
 let uid=0;
 let deckUid=0;
 let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:80,maxHp:80,meal:400,strength:0,dexterity:0,relics:[],battleCount:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
@@ -467,9 +587,8 @@ function showOnly(id){
   ["startScreen","mapScreen","battleScreen","rewardScreen","relicRewardScreen","dormScreen","canteenScreen","eventScreen","sportScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
 }
 function randomType(row){
-  if(row===0)return "battle";
-  const n=Math.random();
-  if(n<.34)return "battle";if(n<.44)return "exam";if(n<.58)return "dorm";if(n<.72)return "canteen";if(n<.86)return "event";return "sport";
+  const pool=row<3?["battle","battle","battle","event"]:["battle","battle","battle","exam","exam","dorm","canteen","event","sport"];
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 function createMap(){
   const nodes=[],edges=[],byRow=[];
@@ -478,24 +597,32 @@ function createMap(){
     for(let i=0;i<count;i++){
       const base=(i+1)/(count+1)*100;
       const node={id:row+"-"+i,row,x:Math.max(12,Math.min(88,base+(Math.random()*8-4))),y:CANVAS_PAD+(ROWS-row)*ROW_GAP,type:randomType(row)};
+      if(node.type==="battle"||node.type==="exam")node.encounterId=rollEncounter(node.type);
       nodes.push(node);rowNodes.push(node);
     }
     byRow.push(rowNodes);
   }
-  const boss={id:"boss",row:ROWS,x:50,y:CANVAS_PAD,type:"boss"};nodes.push(boss);byRow.push([boss]);
+  const boss={id:"boss",row:ROWS,x:50,y:CANVAS_PAD,type:"boss",encounterId:rollEncounter("boss")};nodes.push(boss);byRow.push([boss]);
   for(let row=0;row<ROWS;row++){
     const from=byRow[row],to=byRow[row+1];
-    from.forEach(node=>{
-      const ordered=[...to].sort((a,b)=>Math.abs(a.x-node.x)-Math.abs(b.x-node.x));
-      addEdge(edges,node,ordered[0]);if(to.length>1&&Math.random()<.48)addEdge(edges,node,ordered[1]);
-    });
-    to.forEach(target=>{
-      if(!edges.some(edge=>edge.to===target.id)){
-        const nearest=[...from].sort((a,b)=>Math.abs(a.x-target.x)-Math.abs(b.x-target.x))[0];addEdge(edges,nearest,target);
+    // Ordered connections ensure every node is reachable without crossing edges.
+    let i=0,j=0;
+    addEdge(edges,from[i],to[j]);
+    while(i<from.length-1||j<to.length-1){
+      if(i===from.length-1)j++;
+      else if(j===to.length-1)i++;
+      else {
+        const nextFrom=(i+1)/(from.length-1),nextTo=(j+1)/(to.length-1);
+        if(Math.abs(nextFrom-nextTo)<.01&&Math.random()<.55){i++;j++}
+        else if(nextFrom<nextTo)i++;
+        else if(nextTo<nextFrom)j++;
+        else if(Math.random()<.5)i++;else j++;
       }
-    });
+      addEdge(edges,from[i],to[j]);
+    }
   }
   run.nodes=nodes;run.edges=edges;run.current=null;run.visited=new Set();
+  $("bossPreview").textContent="本层期末："+ENCOUNTERS[boss.encounterId].name;
   renderMap();updateRunHud();
   $("floorText").textContent="入口";$("routeStatus").textContent="从教学楼入口出发";
   $("mapTip").textContent="选择底部任一亮起的节点开始。进入上课节点将触发随堂小测。";
@@ -512,20 +639,39 @@ function nodeState(node){
 function renderMap(){
   const height=CANVAS_PAD*2+ROWS*ROW_GAP,lookup=Object.fromEntries(run.nodes.map(node=>[node.id,node]));
   $("mapCanvas").style.height=height+"px";
-  const svg=$("routeLines");svg.setAttribute("viewBox","0 0 1000 "+height);svg.innerHTML="";
+  const svg=$("routeLines");svg.setAttribute("viewBox","0 0 1000 "+height);svg.setAttribute("preserveAspectRatio","none");svg.innerHTML="";
   run.edges.forEach(edge=>{
     const a=lookup[edge.from],b=lookup[edge.to],line=document.createElementNS("http://www.w3.org/2000/svg","line");
     line.setAttribute("x1",a.x*10);line.setAttribute("y1",a.y);line.setAttribute("x2",b.x*10);line.setAttribute("y2",b.y);
-    line.setAttribute("class","route-line "+(run.visited.has(edge.from)&&run.visited.has(edge.to)?"visited":""));svg.appendChild(line);
+    const state=run.visited.has(edge.from)&&run.visited.has(edge.to)?"visited":edge.from===run.current?"available":"";
+    line.setAttribute("class","route-line "+state);line.dataset.from=edge.from;line.dataset.to=edge.to;
+    svg.appendChild(line);
+    const arrow=document.createElementNS("http://www.w3.org/2000/svg","path");
+    const x=(a.x+b.x)*5,y=(a.y+b.y)/2;
+    arrow.setAttribute("d",`M ${x-7} ${y+5} L ${x} ${y-5} L ${x+7} ${y+5}`);
+    arrow.setAttribute("class","route-arrow "+state);arrow.dataset.from=edge.from;arrow.dataset.to=edge.to;svg.appendChild(arrow);
   });
   const holder=$("mapNodes");holder.innerHTML="";
   run.nodes.forEach(node=>{
     const type=NODE_TYPES[node.type],state=nodeState(node),button=document.createElement("button");
     button.type="button";button.className="map-node "+node.type+" "+state;button.style.left=node.x+"%";button.style.top=node.y+"px";
-    button.disabled=state!=="available";button.setAttribute("aria-label",type.name+"，"+type.detail+(state==="available"?"，可以进入":""));
-    button.innerHTML='<span class="glyph">'+type.glyph+"</span><small>"+type.name+"</small>";
-    button.addEventListener("click",()=>chooseNode(node));holder.appendChild(button);
+    const label=node.type==="boss"?"期末":(node.row+1)+"-"+(Number(node.id.split("-")[1])+1)+" "+type.name;
+    button.title=node.encounterId?ENCOUNTERS[node.encounterId].name+"："+ENCOUNTERS[node.encounterId].note:type.detail;
+    button.dataset.node=node.id;button.setAttribute("aria-label",label+"，"+button.title+(state==="available"?"，可以进入":"，查看连接"));
+    button.innerHTML='<span class="glyph">'+type.glyph+"</span><small>"+label+"</small>";
+    button.addEventListener("pointerenter",()=>highlightRoute(node.id));
+    button.addEventListener("pointerleave",()=>highlightRoute(null));
+    button.addEventListener("focus",()=>highlightRoute(node.id));
+    button.addEventListener("blur",()=>highlightRoute(null));
+    button.addEventListener("click",()=>{if(nodeState(node)==="available")chooseNode(node);else highlightRoute(node.id)});holder.appendChild(button);
   });
+}
+function highlightRoute(id){
+  const connected=new Set([id]);
+  run.edges.forEach(edge=>{if(edge.from===id||edge.to===id){connected.add(edge.from);connected.add(edge.to)}});
+  $("mapCanvas").classList.toggle("route-inspecting",!!id);
+  $("routeLines").querySelectorAll("[data-from]").forEach(line=>line.classList.toggle("route-focused",line.dataset.from===id||line.dataset.to===id));
+  $("mapNodes").querySelectorAll("[data-node]").forEach(node=>node.classList.toggle("route-focused",connected.has(node.dataset.node)));
 }
 function chooseNode(node){
   if(nodeState(node)!=="available")return;
@@ -536,12 +682,12 @@ function chooseNode(node){
   renderMap();updateRunHud();
   if(node.type==="battle"){setTimeout(()=>startBattle("battle"),180);return}
   if(node.type==="exam"){setTimeout(()=>startBattle("exam"),180);return}
+  if(node.type==="boss"){setTimeout(()=>startBattle("boss"),180);return}
   if(node.type==="dorm"){setTimeout(openDorm,180);return}
   if(node.type==="canteen"){setTimeout(openCanteen,180);return}
   if(node.type==="event"){setTimeout(openEvent,180);return}
   if(node.type==="sport"){setTimeout(openSport,180);return}
   $("mapTip").textContent="已进入"+NODE_TYPES[node.type].name+"。节点内容暂未开放，请沿亮起的连线继续。";
-  if(node.type==="boss")setTimeout(()=>{$("finishModal").hidden=false},260);
 }
 function updateRunHud(){
   $("visitedText").textContent=run.visited.size;$("mealText").textContent=run.meal;$("deckCount").textContent=run.deck.length;
@@ -696,15 +842,17 @@ function chooseSport(type){
 }
 
 function startBattle(kind){
-  const elite=kind==="exam";
+  const encounterId=run.pendingNode?.encounterId||rollEncounter(kind),enemy=ENCOUNTERS[encounterId];
+  pendingReward=null;pendingRelic=null;
   battle={
-    kind:elite?"exam":"battle",turn:1,energy:3,nextEnergy:0,nextDraw:0,block:0,playerHp:run.hp,enemyHp:elite?90:52,maxEnemyHp:elite?90:52,enemyBlock:0,enemyThought:0,intents:elite?EXAM_INTENTS:ENEMY_INTENTS,
+    kind:enemy.kind,encounterId,enemy,weak:0,frail:0,vulnerable:0,turn:1,energy:3,nextEnergy:0,nextDraw:0,block:0,playerHp:run.hp,enemyHp:enemy.hp,maxEnemyHp:enemy.hp,enemyBlock:0,enemyThought:0,intents:enemy.moves,
     draw:shuffle(run.deck.map(makeCard)),discard:[],exhaust:[],hand:[],powers:{},doubleNext:false,nextAttackBonus:0,
     exhaustedCount:0,locked:false,over:false,exhaustTriggered:false,delayTriggered:false,prototypeTriggered:false,thoughtAttackTriggers:0,
     nextCardDiscount:0,cardsPlayedTurn:0,penTriggered:false,waterTriggered:false,ringTriggered:false,keepBlockOnce:false,skillPowerTriggered:false,starTriggered:false,typesPlayed:new Set(),playingDamageBonus:0
   };
-  $("quizTitle").textContent=elite?"月考试卷":"随堂小测";$("battleEncounterTitle").textContent=elite?"月考":"随堂小测";
-  showOnly("battleScreen");startPlayerTurn(true);battleLog(elite?"月考试卷已经发下，题量和压力明显提升。":"试卷已经发下，先观察题型。");
+  $("quizTitle").textContent=enemy.name;$("battleEncounterTitle").textContent=NODE_TYPES[enemy.kind].name;
+  $("enemyDescription").textContent=enemy.note;$("battleNodeLabel").textContent=NODE_TYPES[enemy.kind].name+" · 战斗节点";
+  showOnly("battleScreen");startPlayerTurn(true);battleLog("遭遇“"+enemy.name+"”，请查看本回合意图。");
   if(hasRelic("gaokao_guide"))setTimeout(openGuideChoice,180);
 }
 function startPlayerTurn(first){
@@ -866,7 +1014,7 @@ function returnFromExhaust(inst){
   inst.tempCost=0;inst.forcedExhaust=true;battle.hand.push(inst);
 }
 function gainBlock(amount){battle.block+=amount}
-function gainCardBlock(amount){gainBlock(amount+run.dexterity)}
+function gainCardBlock(amount){gainBlock(Math.max(0,Math.floor((amount+run.dexterity)*(battle.frail>0?.75:1))))}
 function loseHp(amount,fromCard){
   battle.playerHp=Math.max(0,battle.playerHp-amount);
   if(fromCard&&battle.powers.contest_body)battle.nextAttackBonus+=battle.powers.contest_body;
@@ -875,7 +1023,7 @@ function loseHp(amount,fromCard){
 function checkRing(){if(hasRelic("ring")&&!battle.ringTriggered&&battle.playerHp<=run.maxHp*.5){battle.ringTriggered=true;battle.keepBlockOnce=true;gainBlock(12);battleLog("戒指触发，获得12点防御。")}}
 function dealAttack(base,hits){
   hits=hits||1;
-  const thought=battle.enemyThought>0,multiplier=(thought?1.5:1)*(battle.doubleNext?2:1),bonus=battle.nextAttackBonus;
+  const thought=battle.enemyThought>0,multiplier=(thought?1.5:1)*(battle.doubleNext?2:1)*(battle.weak>0?.75:1),bonus=battle.nextAttackBonus;
   let total=0;
   for(let i=0;i<hits;i++){
     let damage=Math.floor((base+run.strength+battle.playingDamageBonus+(i===0?bonus:0))*multiplier);
@@ -904,7 +1052,17 @@ function dealEffectDamage(amount){
   let damage=amount,absorbed=Math.min(battle.enemyBlock,damage);battle.enemyBlock-=absorbed;damage-=absorbed;
   battle.enemyHp=Math.max(0,battle.enemyHp-damage);animateEnemy("-"+damage);
 }
-function currentIntent(offset){return battle.intents[(battle.turn-1+(offset||0))%battle.intents.length]}
+function currentIntent(offset=0){
+  const turn=battle.turn-1+offset,intent={...battle.intents[turn%battle.intents.length]};
+  let vulnerable=battle.vulnerable;
+  for(let step=0;step<offset;step++){const previous=battle.intents[(battle.turn-1+step)%battle.intents.length];vulnerable=Math.max(0,vulnerable-1)+(previous.debuff==="vulnerable"?previous.stacks:0)}
+  if(intent.damage)intent.damage=Math.floor((intent.damage+Math.floor(turn/battle.intents.length)*(battle.enemy.growth||0))*(vulnerable>0?1.5:1));
+  const parts=[];
+  if(intent.damage)parts.push("造成"+intent.damage+"点压力"+(intent.hits>1?"×"+intent.hits:""));
+  if(intent.block)parts.push("获得"+intent.block+"点防御");
+  if(intent.debuff)parts.push("施加"+intent.stacks+"回合"+DEBUFFS[intent.debuff].name);
+  intent.text=parts.join("；");return intent;
+}
 function endPlayerTurn(){
   if(battle.locked||battle.over)return;battle.locked=true;
   const delayed=battle.hand.filter(inst=>CARDS[inst.id].delay);
@@ -922,6 +1080,8 @@ function enemyTurn(){
   }
   checkRing();
   if(intent.block)battle.enemyBlock+=intent.block;
+  Object.keys(DEBUFFS).forEach(key=>{battle[key]=Math.max(0,battle[key]-1)});
+  if(intent.debuff)battle[intent.debuff]+=intent.stacks;
   animateBattle(total?"压力 -"+total:"完全防住");
   battleLog("“"+intent.name+"”造成"+total+"点实际压力。");
   if(battle.enemyThought>0){battle.enemyThought--;if(battle.powers.thought_loop)dealEffectDamage(battle.powers.thought_loop)}
@@ -943,6 +1103,8 @@ function renderBattle(){
   const intent=currentIntent(),nextIntent=currentIntent(1);$("intentName").textContent=intent.name;$("intentText").textContent=intent.text+(hasRelic("iphone")?"；下回合："+nextIntent.name+"（"+nextIntent.text+"）":"");
   $("battleEndTurn").disabled=battle.locked||battle.over;
   renderPowers();renderHand();
+  const statuses=$("playerDebuffs");statuses.innerHTML="";
+  Object.entries(DEBUFFS).forEach(([key,def])=>{if(battle[key]>0){const tag=document.createElement("span");tag.textContent=def.name+" "+battle[key]+"回合 · "+def.text;statuses.appendChild(tag)}});
 }
 function renderPowers(){
   const names={defense:"公开答辩",inertia:"思维惯性",waste_value:"废案价值",contest_body:"竞赛体质",deadline:"截止效应",recycle_power:"化废为宝",thought_loop:"思路闭环",prototype:"原型迭代",duty_schedule:"值日安排",grade_star:"年级之星"};
@@ -968,7 +1130,7 @@ function animateEnemy(text){const enemy=$("quizEnemy");enemy.classList.remove("h
 function animateBattle(text){const el=$("battleFloat");el.textContent=text;el.classList.remove("show");void el.offsetWidth;el.classList.add("show")}
 function winBattle(){
   if(battle.over)return;battle.over=true;battle.locked=true;run.hp=battle.playerHp;renderBattle();
-  battleLog("随堂小测完成，正在结算奖励。");setTimeout(showRewards,600);
+  battleLog(battle.enemy.name+"已完成，正在结算奖励。");setTimeout(showRewards,600);
 }
 function loseBattle(){
   battle.over=true;battle.locked=true;run.hp=0;renderBattle();$("defeatModal").hidden=false;
@@ -983,9 +1145,9 @@ function generateRewardCards(){
   return ids;
 }
 function showRewards(){
-  if(!pendingReward){const meal=10+Math.floor(Math.random()*21)+(hasRelic("certificate")?10:0);run.meal+=meal;pendingReward={cards:[],meal,picksRemaining:battle.kind==="exam"?2:1,round:1,elite:battle.kind==="exam"}}
+  if(!pendingReward){const meal=10+Math.floor(Math.random()*21)+(hasRelic("certificate")?10:0);run.meal+=meal;pendingReward={cards:[],meal,picksRemaining:battle.kind==="battle"?1:2,round:1,elite:battle.kind!=="battle"}}
   pendingReward.cards=generateRewardCards();$("mealReward").textContent=pendingReward.meal;
-  $("rewardEyebrow").textContent=pendingReward.elite?"月考节点完成":"上课节点完成";$("rewardTitle").textContent=pendingReward.elite?"第"+pendingReward.round+"次卡牌奖励":"选择1张卡牌";
+  $("rewardEyebrow").textContent=battle.enemy.name+" · 胜利";$("rewardTitle").textContent=pendingReward.elite?"第"+pendingReward.round+"次卡牌奖励":"选择1张卡牌";
   const holder=$("rewardCards");holder.innerHTML="";
   pendingReward.cards.forEach(id=>{
     const option=document.createElement("div");option.className="reward-option";
@@ -996,10 +1158,12 @@ function showRewards(){
   showOnly("rewardScreen");
 }
 function selectReward(id){
-  run.deck.push(makeDeckEntry(id));pendingReward.picksRemaining--;
+  if(!pendingReward||$("rewardScreen").hidden)return;
+  if(id&&!pendingReward.cards.includes(id))return;
+  if(id)run.deck.push(makeDeckEntry(id));pendingReward.picksRemaining--;
   if(pendingReward.picksRemaining>0){pendingReward.round++;showRewards();return}
   if(pendingReward.elite){showRelicReward();return}
-  const cardName=CARDS[id].name;pendingReward=null;completeBattleRewards("已将“"+cardName+"”加入牌组，并获得饭卡价值。");
+  const message=id?"已将“"+CARDS[id].name+"”加入牌组。":"已跳过卡牌奖励，保留饭卡价值。";pendingReward=null;completeBattleRewards(message);
 }
 function rollRelicRarity(){return rollRarity()}
 function showRelicReward(){
@@ -1010,22 +1174,24 @@ function showRelicReward(){
   showOnly("relicRewardScreen");
 }
 function grantRelic(id){if(id&&!hasRelic(id))run.relics.push(id);updateRunHud()}
-function claimRelicReward(){
-  const name=pendingRelic?RELICS[pendingRelic].name:"无";grantRelic(pendingRelic);pendingRelic=null;pendingReward=null;completeBattleRewards(name==="无"?"已完成月考奖励结算。":"获得圣遗物“"+name+"”。");
+function claimRelicReward(skip=false){
+  if($("relicRewardScreen").hidden||!pendingReward)return;
+  const name=pendingRelic?RELICS[pendingRelic].name:"无";if(!skip)grantRelic(pendingRelic);pendingRelic=null;pendingReward=null;completeBattleRewards(skip?"已跳过圣遗物奖励。":name==="无"?"奖励结算完成。":"获得圣遗物“"+name+"”。");
 }
 function completeBattleRewards(message){
   run.battleCount++;let extra="";
   if(hasRelic("transcript")&&run.battleCount%3===0){const pool=run.deck.filter(card=>!card.upgraded);if(pool.length){const card=pool[Math.floor(Math.random()*pool.length)];card.upgraded=true;extra=" 成绩单将“"+CARDS[card.id].name+"”升级了。"}}
   finishNode(message+extra);
+  if(battle.kind==="boss"){$("finishTitle").textContent="高一学年通关";$("finishSummary").textContent="你击败了“"+battle.enemy.name+"”，完成了本层期末考试。";$("finishModal").hidden=false}
 }
 
 $("startForm").addEventListener("submit",event=>{event.preventDefault();const id=$("playerId").value.trim();if(!id){$("formError").textContent="请输入学生 ID 后开始游戏";$("playerId").focus();return}$("formError").textContent="";enterGame(id)});
 $("playerId").addEventListener("input",()=>{$("formError").textContent=""});
-$("newRun").addEventListener("click",backToStart);$("rerollMap").addEventListener("click",createMap);
-$("restartMap").addEventListener("click",()=>{$("finishModal").hidden=true;createMap()});
+$("newRun").addEventListener("click",backToStart);
+$("restartMap").addEventListener("click",backToStart);
 $("battleEndTurn").addEventListener("click",endPlayerTurn);
 $("cancelSelection").addEventListener("click",cancelSelection);$("confirmSelection").addEventListener("click",confirmSelection);
-$("retryBattle").addEventListener("click",()=>{$("defeatModal").hidden=true;run.hp=run.maxHp;startBattle(run.pendingNode?.type==="exam"?"exam":"battle")});
+$("retryBattle").addEventListener("click",()=>{$("defeatModal").hidden=true;run.hp=run.maxHp;startBattle(run.pendingNode?.type||"battle")});
 $("chooseRest").addEventListener("click",restAtDorm);
 $("chooseUpgrade").addEventListener("click",()=>openDeckAction("upgrade"));
 $("cancelDeckAction").addEventListener("click",cancelDeckAction);
@@ -1039,16 +1205,10 @@ $("closeDeckView").addEventListener("click",()=>{$("deckViewModal").hidden=true}
 $("closeCollection").addEventListener("click",closeCollectionView);
 document.querySelectorAll(".pile-view-button").forEach(button=>button.addEventListener("click",()=>openPileView(button.dataset.pile)));
 $("toggleUpgradePreview").addEventListener("click",toggleUpgradePreview);
-$("claimRelic").addEventListener("click",claimRelicReward);
+$("claimRelic").addEventListener("click",()=>claimRelicReward(false));
+$("skipCardReward").addEventListener("click",()=>selectReward(null));
+$("skipRelicReward").addEventListener("click",()=>claimRelicReward(true));
 updateRealTime();setInterval(updateRealTime,1000);
-
-if(document.modelContext?.registerTool){
-  try{Promise.resolve(document.modelContext.registerTool({
-    name:"generate_new_school_route",title:"生成新路线",description:"为当前高一第一层重新生成随机校园路线地图。",
-    inputSchema:{type:"object",properties:{},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},
-    execute(){if($("mapScreen").hidden)throw new Error("当前不在地图界面");createMap();return {status:"generated",nodes:run.nodes.length,paths:run.edges.length}}
-  })).catch(()=>{})}catch{}
-}
 
   </script>
 </body>

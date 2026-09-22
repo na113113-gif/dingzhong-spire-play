@@ -67,7 +67,7 @@ const ENEMY_INTENTS=[
 const ROWS=12,ROW_GAP=126,CANVAS_PAD=82;
 let uid=0;
 let deckUid=0;
-let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:40,maxHp:40,meal:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
+let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:80,maxHp:80,meal:0,strength:0,dexterity:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
 let battle=null,selection=null,pendingReward=null,deckAction=null,upgradePreview=false;
 const $=id=>document.getElementById(id);
 const makeDeckEntry=id=>({id,upgraded:false,deckUid:++deckUid});
@@ -75,7 +75,7 @@ const makeCard=source=>{const entry=typeof source==="string"?{id:source,upgraded
 const shuffle=list=>{const a=[...list];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
 function showOnly(id){
-  ["startScreen","mapScreen","battleScreen","rewardScreen","dormScreen","canteenScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
+  ["startScreen","mapScreen","battleScreen","rewardScreen","dormScreen","canteenScreen","eventScreen","sportScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
 }
 function randomType(row){
   if(row===0)return "battle";
@@ -148,17 +148,20 @@ function chooseNode(node){
   if(node.type==="battle"){setTimeout(startBattle,180);return}
   if(node.type==="dorm"){setTimeout(openDorm,180);return}
   if(node.type==="canteen"){setTimeout(openCanteen,180);return}
+  if(node.type==="event"){setTimeout(openEvent,180);return}
+  if(node.type==="sport"){setTimeout(openSport,180);return}
   $("mapTip").textContent="已进入"+NODE_TYPES[node.type].name+"。节点内容暂未开放，请沿亮起的连线继续。";
   if(node.type==="boss")setTimeout(()=>{$("finishModal").hidden=false},260);
 }
 function updateRunHud(){
   $("visitedText").textContent=run.visited.size;$("mealText").textContent=run.meal;$("deckCount").textContent=run.deck.length;
+  $("strengthText").textContent=run.strength;$("dexterityText").textContent=run.dexterity;
   const hpText=document.querySelector(".profile-panel .status-line b"),hpBar=document.querySelector(".profile-panel .status-bar i");
   if(hpText)hpText.textContent=run.hp+" / "+run.maxHp;if(hpBar)hpBar.style.width=(run.hp/run.maxHp*100)+"%";
 }
 function enterGame(id){
-  run.id=id;run.deck=STARTER_DECK.map(makeDeckEntry);run.hp=40;run.maxHp=40;run.meal=0;run.dormVisits=0;run.bingeCount=0;run.shop=null;
-  $("displayId").textContent=id;$("battlePlayerId").textContent=id;$("dormPlayerId").textContent=id;showOnly("mapScreen");createMap();
+  run.id=id;run.deck=STARTER_DECK.map(makeDeckEntry);run.hp=80;run.maxHp=80;run.meal=0;run.strength=0;run.dexterity=0;run.dormVisits=0;run.bingeCount=0;run.shop=null;
+  $("displayId").textContent=id;$("battlePlayerId").textContent=id;$("dormPlayerId").textContent=id;$("eventPlayerId").textContent=id;$("sportPlayerId").textContent=id;showOnly("mapScreen");createMap();
 }
 function backToStart(){showOnly("startScreen");$("finishModal").hidden=true;$("playerId").focus()}
 
@@ -257,6 +260,17 @@ function buyClassCard(item){
   if(item.sold||run.meal<item.price)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop();
 }
 
+function openEvent(){
+  const slot=String(1+Math.floor(Math.random()*6)).padStart(2,"0");
+  $("eventTitle").textContent="未命名事件 "+slot;showOnly("eventScreen");
+}
+function openSport(){showOnly("sportScreen")}
+function chooseSport(type){
+  if(type==="run"){run.maxHp+=10;finishNode("完成跑步训练，最大专注增加 10。");return}
+  if(type==="basketball"){run.strength++;finishNode("完成篮球训练，获得 1 点力量。");return}
+  run.dexterity++;finishNode("完成羽毛球训练，获得 1 点敏捷。");
+}
+
 function startBattle(){
   battle={
     turn:1,energy:3,nextEnergy:0,nextDraw:0,block:0,playerHp:run.hp,enemyHp:52,maxEnemyHp:52,enemyBlock:0,enemyThought:0,
@@ -343,23 +357,23 @@ function resolveCardPlay(inst,selected){
     case"brainstorm":dealAttack(inst.upgraded?10:8);battle.enemyThought+=inst.upgraded?3:2;break;
     case"continuous":dealAttack(inst.upgraded?4:3,4);break;
     case"research":dealAttack(inst.upgraded?12:9);break;
-    case"solve":{const active=battle.enemyThought>0;dealAttack(inst.upgraded?10:7);if(active)gainBlock(inst.upgraded?5:4);break}
+    case"solve":{const active=battle.enemyThought>0;dealAttack(inst.upgraded?10:7);if(active)gainCardBlock(inst.upgraded?5:4);break}
     case"catch_gap":{const active=battle.enemyThought>0;dealAttack(inst.upgraded?9:6);battle.enemyThought+=active?2:1;break}
     case"rebuild":if(selected.length){exhaustSelected(selected,"hand");selectedUsed=true;dealAttack(inst.upgraded?17:13)}else dealAttack(inst.upgraded?7:5);break;
     case"combo":dealAttack(inst.upgraded?5:4,3+Math.min(2,Math.floor(battle.exhaustedCount/4)));break;
     case"showcase":dealAttack((inst.upgraded?18:14)+Math.min(inst.upgraded?24:20,battle.exhaust.length*2));break;
     case"ultimate":dealAttack(inst.upgraded?30:24);battle.enemyThought+=3;break;
     case"conjecture":{const layers=Math.min(3,battle.enemyThought);battle.enemyThought=0;dealAttack((inst.upgraded?15:12)+layers*(inst.upgraded?7:6));break}
-    case"organize":gainBlock(inst.upgraded?8:5);break;
+    case"organize":gainCardBlock(inst.upgraded?8:5);break;
     case"myth":loseHp(2,true);battle.doubleNext=true;break;
-    case"tradeoff":exhaustSelected(selected,"hand");selectedUsed=true;gainBlock(inst.upgraded?8:5);break;
-    case"backup":gainBlock(inst.upgraded?11:8);break;
+    case"tradeoff":exhaustSelected(selected,"hand");selectedUsed=true;gainCardBlock(inst.upgraded?8:5);break;
+    case"backup":gainCardBlock(inst.upgraded?11:8);break;
     case"seminar":battle.enemyThought+=inst.upgraded?3:2;break;
     case"review":returnFromDiscard(selected[0]);selectedUsed=true;break;
     case"recycle_draft":exhaustSelected(selected,"hand");selectedUsed=true;drawCards(inst.upgraded?3:2);break;
     case"restart":{const count=selected.length;exhaustSelected(selected,"hand");selectedUsed=true;drawCards(count+1);break}
     case"overtime":loseHp(inst.upgraded?2:3,true);battle.energy+=2;break;
-    case"emergency":exhaustSelected(selected,"discard");selectedUsed=true;gainBlock(inst.upgraded?18:14);break;
+    case"emergency":exhaustSelected(selected,"discard");selectedUsed=true;gainCardBlock(inst.upgraded?18:14);break;
     case"negation":returnFromExhaust(selected[0]);selectedUsed=true;break;
     default:applyPower(inst.id,inst.upgraded);
   }
@@ -385,6 +399,7 @@ function returnFromExhaust(inst){
   inst.tempCost=0;inst.forcedExhaust=true;battle.hand.push(inst);
 }
 function gainBlock(amount){battle.block+=amount}
+function gainCardBlock(amount){gainBlock(amount+run.dexterity)}
 function loseHp(amount,fromCard){
   battle.playerHp=Math.max(0,battle.playerHp-amount);
   if(fromCard&&battle.powers.contest_body)battle.nextAttackBonus+=battle.powers.contest_body;
@@ -394,7 +409,7 @@ function dealAttack(base,hits){
   const thought=battle.enemyThought>0,multiplier=(thought?1.5:1)*(battle.doubleNext?2:1),bonus=battle.nextAttackBonus;
   let total=0;
   for(let i=0;i<hits;i++){
-    let damage=Math.floor((base+(i===0?bonus:0))*multiplier);
+    let damage=Math.floor((base+run.strength+(i===0?bonus:0))*multiplier);
     const absorbed=Math.min(battle.enemyBlock,damage);battle.enemyBlock-=absorbed;damage-=absorbed;
     battle.enemyHp=Math.max(0,battle.enemyHp-damage);total+=damage;
   }
@@ -410,7 +425,7 @@ function exhaustCard(inst,context){
   if(!battle.exhaustTriggered&&battle.powers.waste_value){battle.exhaustTriggered=true;gainBlock(battle.powers.waste_value)}
   if(battle.powers.recycle_power)dealEffectDamage(battle.powers.recycle_power);
   if(context.delay&&!battle.delayTriggered&&battle.powers.deadline){battle.delayTriggered=true;battle.nextEnergy+=battle.powers.deadline;battle.nextDraw+=battle.powers.deadline_draw||0}
-  if(context.delay&&inst.id==="backup")gainBlock(inst.upgraded?7:5);
+  if(context.delay&&inst.id==="backup")gainCardBlock(inst.upgraded?7:5);
   if(CARDS[inst.id].type==="attack"&&!battle.prototypeTriggered&&battle.powers.prototype){
     battle.prototypeTriggered=true;
     for(let i=0;i<battle.powers.prototype;i++){const copy=makeCard({id:inst.id,upgraded:!!battle.powers.prototype_upgraded});copy.tempCost=0;copy.forcedExhaust=true;battle.hand.push(copy)}
@@ -449,6 +464,7 @@ function renderBattle(){
   run.hp=battle.playerHp;
   $("battleTurn").textContent="第"+battle.turn+"回合";$("battleHpText").textContent=battle.playerHp+" / "+run.maxHp;
   $("battleHpBar").style.width=(battle.playerHp/run.maxHp*100)+"%";$("battleBlock").textContent=battle.block;
+  $("battleStrength").textContent=run.strength;$("battleDexterity").textContent=run.dexterity;
   $("nextAttackState").textContent=battle.doubleNext?"双倍":(battle.nextAttackBonus?"+"+battle.nextAttackBonus:"无");
   $("quizHpText").textContent=battle.enemyHp+" / "+battle.maxEnemyHp;$("quizHpBar").style.width=(battle.enemyHp/battle.maxEnemyHp*100)+"%";
   $("battleEnergy").textContent=battle.energy;$("battleDraw").textContent=battle.draw.length;$("battleDiscard").textContent=battle.discard.length;$("battleExhaust").textContent=battle.exhaust.length;
@@ -525,6 +541,8 @@ $("chooseUpgrade").addEventListener("click",()=>openDeckAction("upgrade"));
 $("cancelDeckAction").addEventListener("click",cancelDeckAction);
 $("leaveCanteen").addEventListener("click",()=>finishNode("已离开食堂。"));
 $("bingeButton").addEventListener("click",()=>openDeckAction("remove"));
+$("leaveEvent").addEventListener("click",()=>finishNode("已离开超市，事件内容等待设计。"));
+document.querySelectorAll(".sport-option").forEach(button=>button.addEventListener("click",()=>chooseSport(button.dataset.sport)));
 $("inspectDeck").addEventListener("click",openDeckView);
 $("closeDeckView").addEventListener("click",()=>{$("deckViewModal").hidden=true});
 $("toggleUpgradePreview").addEventListener("click",toggleUpgradePreview);

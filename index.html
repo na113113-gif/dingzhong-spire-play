@@ -56,13 +56,15 @@
       <aside class="profile-panel panel">
         <div class="profile-head"><span class="role-letter small">C</span><div><small>玩家 ID</small><strong id="displayId"></strong></div></div>
         <h2>C部 · 创新班学生</h2>
-        <div class="status-line"><span>专注</span><b>40 / 40</b></div>
+        <div class="status-line"><span>专注</span><b>80 / 80</b></div>
         <div class="status-bar"><i></i></div>
         <dl class="run-stats">
           <div><dt>当前阶段</dt><dd id="floorText">入口</dd></div>
           <div><dt>已通过</dt><dd id="visitedText">0</dd></div>
           <div><dt>饭卡价值</dt><dd id="mealText">0</dd></div>
           <div><dt>牌组</dt><dd id="deckCount">10</dd></div>
+          <div><dt>力量</dt><dd id="strengthText">0</dd></div>
+          <div><dt>敏捷</dt><dd id="dexterityText">0</dd></div>
         </dl>
         <div class="deck-note"><small>初始牌组 · 10张</small><span>快速作答×4　整理思路×4</span><span>头脑风暴×1　竞赛神话×1</span></div>
         <button id="inspectDeck" class="deck-button" type="button">查看当前牌组</button>
@@ -87,7 +89,7 @@
           <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
           <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
         </ul>
-        <div class="placeholder-note"><strong>当前版本</strong><p>上课、宿舍与食堂节点可交互。超市、操场与期末内容等待设计。</p></div>
+        <div class="placeholder-note"><strong>当前版本</strong><p>上课、宿舍、食堂、超市与操场节点可交互。期末内容等待设计。</p></div>
       </aside>
     </div>
   </main>
@@ -131,6 +133,40 @@
     </section>
   </main>
 
+  <main id="eventScreen" class="node-screen event-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>超市 · 随机节点</small></div></div>
+      <div class="route-title"><small>偶遇</small><strong>随机事件</strong></div>
+      <div class="battle-header-id">ID　<strong id="eventPlayerId"></strong></div>
+    </header>
+    <section class="node-stage event-stage">
+      <article class="event-card panel">
+        <span class="event-mark">?</span>
+        <p class="eyebrow">超市随机事件</p>
+        <h1 id="eventTitle">未命名事件 01</h1>
+        <p>事件内容与选项等待后续设计。</p>
+        <small>每次进入超市都会重新抽取1个事件槽位。</small>
+        <button id="leaveEvent" class="primary-button" type="button">继续前进</button>
+      </article>
+    </section>
+  </main>
+
+  <main id="sportScreen" class="node-screen sport-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>操场 · 体育节点</small></div></div>
+      <div class="route-title"><small>自由活动</small><strong>选择1项训练</strong></div>
+      <div class="battle-header-id">ID　<strong id="sportPlayerId"></strong></div>
+    </header>
+    <section class="node-stage sport-stage">
+      <div class="node-intro"><p class="eyebrow">操场节点</p><h1>今天练什么？</h1><p>选择1项加成，效果持续到本次游戏结束。</p></div>
+      <div class="choice-grid sport-choice-grid">
+        <article class="choice-card sport-choice"><span class="choice-mark">跑</span><p class="eyebrow">跑步</p><h2>耐力训练</h2><p>最大专注增加 <strong>10</strong>。</p><small>当前专注不变。</small><button class="primary-button sport-option" data-sport="run" type="button">选择跑步</button></article>
+        <article class="choice-card sport-choice"><span class="choice-mark">篮</span><p class="eyebrow">篮球</p><h2>力量训练</h2><p>获得 <strong>1</strong> 点力量。</p><small>每点力量使每段攻击伤害 +1。</small><button class="primary-button sport-option" data-sport="basketball" type="button">选择篮球</button></article>
+        <article class="choice-card sport-choice"><span class="choice-mark">羽</span><p class="eyebrow">羽毛球</p><h2>敏捷训练</h2><p>获得 <strong>1</strong> 点敏捷。</p><small>每点敏捷使卡牌获得的防御 +1。</small><button class="primary-button sport-option" data-sport="badminton" type="button">选择羽毛球</button></article>
+      </div>
+    </section>
+  </main>
+
   <main id="battleScreen" class="battle-screen" hidden>
     <header class="topbar">
       <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>上课 · 战斗节点</small></div></div>
@@ -142,9 +178,9 @@
         <span class="role-letter small">C</span>
         <p class="eyebrow">C部 · 创新班学生</p>
         <h2 id="battleRoleName">创新班学生</h2>
-        <div class="status-line"><span>专注</span><b id="battleHpText">40 / 40</b></div>
+        <div class="status-line"><span>专注</span><b id="battleHpText">80 / 80</b></div>
         <div class="status-bar"><i id="battleHpBar"></i></div>
-        <div class="combat-values"><span>防御 <b id="battleBlock">0</b></span><span>思路增幅 <b id="nextAttackState">无</b></span></div>
+        <div class="combat-values"><span>防御 <b id="battleBlock">0</b></span><span>思路增幅 <b id="nextAttackState">无</b></span><span>力量 <b id="battleStrength">0</b></span><span>敏捷 <b id="battleDexterity">0</b></span></div>
         <div id="powerList" class="power-list"><small>暂无天赋</small></div>
       </aside>
 

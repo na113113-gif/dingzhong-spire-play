@@ -101,7 +101,7 @@ const EXAM_INTENTS=[
 const ROWS=12,ROW_GAP=126,CANVAS_PAD=82;
 let uid=0;
 let deckUid=0;
-let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:80,maxHp:80,meal:0,strength:0,dexterity:0,relics:[],battleCount:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
+let run={nodes:[],edges:[],current:null,visited:new Set(),id:"",deck:[],hp:80,maxHp:80,meal:400,strength:0,dexterity:0,relics:[],battleCount:0,pendingNode:null,dormVisits:0,bingeCount:0,shop:null};
 let battle=null,selection=null,pendingReward=null,pendingRelic=null,deckAction=null,utilityChoice=null,upgradePreview=false;
 const $=id=>document.getElementById(id);
 const makeDeckEntry=id=>({id,upgraded:false,deckUid:++deckUid});
@@ -197,7 +197,7 @@ function updateRunHud(){
   if(hpText)hpText.textContent=run.hp+" / "+run.maxHp;if(hpBar)hpBar.style.width=(run.hp/run.maxHp*100)+"%";
 }
 function enterGame(id){
-  run.id=id;run.deck=STARTER_DECK.map(makeDeckEntry);run.hp=80;run.maxHp=80;run.meal=0;run.strength=0;run.dexterity=0;run.relics=[];run.battleCount=0;run.dormVisits=0;run.bingeCount=0;run.shop=null;
+  run.id=id;run.deck=STARTER_DECK.map(makeDeckEntry);run.hp=80;run.maxHp=80;run.meal=400;run.strength=0;run.dexterity=0;run.relics=[];run.battleCount=0;run.dormVisits=0;run.bingeCount=0;run.shop=null;
   $("displayId").textContent=id;$("battlePlayerId").textContent=id;$("dormPlayerId").textContent=id;$("eventPlayerId").textContent=id;$("sportPlayerId").textContent=id;showOnly("mapScreen");createMap();
 }
 function backToStart(){showOnly("startScreen");$("finishModal").hidden=true;$("playerId").focus()}
@@ -233,6 +233,25 @@ function renderRunRelics(){
   const holder=$("relicList");holder.innerHTML="";
   if(!run.relics.length){holder.innerHTML="<small>暂无圣遗物</small>";return}
   run.relics.forEach(id=>{const span=document.createElement("span");span.textContent=RELICS[id].name;span.title=RELICS[id].text;holder.appendChild(span)});
+}
+function closeCollectionView(){$("collectionModal").hidden=true}
+function openPileView(zone){
+  if(!battle)return;
+  const labels={draw:"抽牌堆",discard:"弃牌堆",exhaust:"消耗牌堆"},cards=[...(battle[zone]||[])];
+  $("collectionTitle").textContent=labels[zone]+" · "+cards.length+"张";
+  $("collectionHint").textContent=zone==="draw"?"展示抽牌堆所含卡牌，实际抽取顺序保持隐藏。":"点击关闭后继续战斗。";
+  const holder=$("collectionGrid");holder.className="collection-grid";holder.innerHTML="";
+  if(!cards.length){holder.innerHTML='<p class="collection-empty">当前牌堆为空。</p>'}
+  cards.forEach(entry=>{const card=createCardElement(entry);card.disabled=true;holder.appendChild(card)});
+  $("collectionModal").hidden=false;
+}
+function openRelicDetails(){
+  $("collectionTitle").textContent="圣遗物详情 · "+run.relics.length+"件";
+  $("collectionHint").textContent="当前持有圣遗物及其完整效果。";
+  const holder=$("collectionGrid");holder.className="collection-grid relic-detail-grid";holder.innerHTML="";
+  if(!run.relics.length){holder.innerHTML='<p class="collection-empty">当前没有圣遗物。</p>'}
+  run.relics.forEach(id=>{const relic=RELICS[id],item=document.createElement("article");item.className="relic-detail-item";item.innerHTML='<small>'+RARITY_LABEL[relic.rarity]+' · 圣遗物</small><h3>'+relic.name+'</h3><p>'+relic.text+'</p>';holder.appendChild(item)});
+  $("collectionModal").hidden=false;
 }
 function openDorm(){
   const isNoon=run.dormVisits%2===0,name=isNoon?"午休":"晚休",percent=(isNoon?25:35)+(hasRelic("rose")?5:0),heal=Math.ceil(run.maxHp*percent/100);
@@ -279,7 +298,7 @@ function generateShop(){
   const colorless=[];
   while(colorless.length<2){const rarity=rollRarity(),pool=Object.keys(CARDS).filter(id=>CARDS[id].colorless&&CARDS[id].rarity===rarity&&!colorless.some(item=>item.id===id));const id=pool[Math.floor(Math.random()*pool.length)];if(id)colorless.push({id,rarity,price:priceFor(rarity,50),sold:false})}
   const relicPool=shuffle(Object.keys(RELICS).filter(id=>!hasRelic(id))).slice(0,3);
-  run.shop={cards,colorless,relics:relicPool.map(id=>({id,price:500+Math.floor(Math.random()*101),sold:false})),foods:Array.from({length:3},(_,index)=>({name:"食物槽位 "+(index+1)}))};
+  run.shop={cards,colorless,relics:relicPool.map(id=>({id,price:340+Math.floor(Math.random()*21),sold:false})),foods:Array.from({length:3},(_,index)=>({name:"食物槽位 "+(index+1)}))};
 }
 function openCanteen(){generateShop();showOnly("canteenScreen");renderShop()}
 function renderShop(){
@@ -661,7 +680,10 @@ $("bingeButton").addEventListener("click",()=>openDeckAction("remove"));
 $("leaveEvent").addEventListener("click",()=>finishNode("已离开超市，事件内容等待设计。"));
 document.querySelectorAll(".sport-option").forEach(button=>button.addEventListener("click",()=>chooseSport(button.dataset.sport)));
 $("inspectDeck").addEventListener("click",openDeckView);
+$("inspectRelics").addEventListener("click",openRelicDetails);
 $("closeDeckView").addEventListener("click",()=>{$("deckViewModal").hidden=true});
+$("closeCollection").addEventListener("click",closeCollectionView);
+document.querySelectorAll(".pile-view-button").forEach(button=>button.addEventListener("click",()=>openPileView(button.dataset.pile)));
 $("toggleUpgradePreview").addEventListener("click",toggleUpgradePreview);
 $("claimRelic").addEventListener("click",claimRelicReward);
 updateRealTime();setInterval(updateRealTime,1000);

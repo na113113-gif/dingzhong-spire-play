@@ -61,7 +61,7 @@
         <dl class="run-stats">
           <div><dt>当前阶段</dt><dd id="floorText">入口</dd></div>
           <div><dt>已通过</dt><dd id="visitedText">0</dd></div>
-          <div><dt>饭卡价值</dt><dd id="mealText">0</dd></div>
+          <div><dt>饭卡价值</dt><dd id="mealText">400</dd></div>
           <div><dt>牌组</dt><dd id="deckCount">10</dd></div>
           <div><dt>力量</dt><dd id="strengthText">0</dd></div>
           <div><dt>敏捷</dt><dd id="dexterityText">0</dd></div>
@@ -70,6 +70,7 @@
         <div class="deck-note"><small>初始牌组 · 10张</small><span>快速作答×4　整理思路×4</span><span>头脑风暴×1　竞赛神话×1</span></div>
         <button id="inspectDeck" class="deck-button" type="button">查看当前牌组</button>
         <div id="relicList" class="run-relics"><small>暂无圣遗物</small></div>
+        <button id="inspectRelics" class="deck-button relic-detail-button" type="button">查看圣遗物详情</button>
       </aside>
       <section class="map-panel panel" aria-labelledby="mapTitle">
         <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1></div><button id="rerollMap" class="text-button" type="button">重新生成</button></div>
@@ -130,7 +131,7 @@
       <div class="shop-heading"><div><p class="eyebrow">食堂货架</p><h1>C部专属货架</h1></div><p><span class="color-key c">C部绿色</span><span class="color-key a">A部红色</span><span class="color-key b">B部蓝色</span><span class="color-key n">无色</span></p></div>
       <section class="shop-section"><div class="section-title"><h2>角色卡牌</h2><small>5张 · 普通 7 / 罕见 2 / 稀有 1</small></div><div id="classShopCards" class="shop-grid card-goods"></div></section>
       <section class="shop-section"><div class="section-title"><h2>无色卡牌</h2><small>2张 · 普通 7 / 罕见 2 / 稀有 1</small></div><div id="colorlessShopCards" class="shop-grid compact-goods"></div></section>
-      <section class="shop-section"><div class="section-title"><h2>圣遗物</h2><small>3件 · 每件 500—600</small></div><div id="relicShopItems" class="shop-grid compact-goods"></div></section>
+      <section class="shop-section"><div class="section-title"><h2>圣遗物</h2><small>3件 · 每件 340—360</small></div><div id="relicShopItems" class="shop-grid compact-goods"></div></section>
       <section class="shop-section"><div class="section-title"><h2>食物</h2><small>3种 · 内容与价格待设计</small></div><div id="foodShopItems" class="shop-grid compact-goods"></div></section>
       <section class="binge-panel panel"><div><p class="eyebrow">暴食</p><h2>从牌组移除1张卡牌</h2><p>本次价格 <strong id="bingePrice">150</strong>，每次暴食后价格 +75。</p></div><button id="bingeButton" class="primary-button" type="button">选择要移除的牌</button></section>
     </section>
@@ -209,9 +210,9 @@
         <h2>意图始终可见</h2>
         <p>随堂小测以攻击为主。根据下一步意图安排攻击与防御。</p>
         <dl>
-          <div><dt>抽牌堆</dt><dd id="battleDraw">10</dd></div>
-          <div><dt>弃牌堆</dt><dd id="battleDiscard">0</dd></div>
-          <div><dt>消耗牌堆</dt><dd id="battleExhaust">0</dd></div>
+          <div><dt>抽牌堆</dt><dd><button class="pile-view-button" data-pile="draw" type="button"><b id="battleDraw">10</b><small>查看</small></button></dd></div>
+          <div><dt>弃牌堆</dt><dd><button class="pile-view-button" data-pile="discard" type="button"><b id="battleDiscard">0</b><small>查看</small></button></dd></div>
+          <div><dt>消耗牌堆</dt><dd><button class="pile-view-button" data-pile="exhaust" type="button"><b id="battleExhaust">0</b><small>查看</small></button></dd></div>
         </dl>
       </aside>
     </section>
@@ -289,6 +290,17 @@
       <h2 id="utilityChoiceTitle">选择1张牌</h2>
       <p id="utilityChoiceHint"></p>
       <div id="utilityChoiceCards" class="selection-cards"></div>
+    </section>
+  </div>
+
+  <div id="collectionModal" class="modal" hidden>
+    <section class="modal-card collection-card" role="dialog" aria-modal="true" aria-labelledby="collectionTitle">
+      <div class="collection-head">
+        <div><p class="eyebrow">信息查看</p><h2 id="collectionTitle">牌堆</h2></div>
+        <button id="closeCollection" class="text-button" type="button">关闭</button>
+      </div>
+      <p id="collectionHint"></p>
+      <div id="collectionGrid" class="collection-grid"></div>
     </section>
   </div>
 

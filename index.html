@@ -43,6 +43,8 @@
         <p class="form-error" id="formError" aria-live="polite"></p>
         <button class="primary-button" type="submit">开始游戏</button>
       </form>
+      <button id="openEncyclopedia" class="deck-button encyclopedia-entry" type="button">查看卡牌与圣遗物百科</button>
+      <p class="author-credit">作者：艾萨克·牛顿</p>
     </section>
   </main>
 
@@ -140,18 +142,18 @@
 
   <main id="eventScreen" class="node-screen event-screen" hidden>
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>超市 · 随机节点</small></div></div>
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>校园偶遇 · 随机节点</small></div></div>
       <div class="route-title"><small>偶遇</small><strong>随机事件</strong></div>
       <div class="battle-header-id">ID　<strong id="eventPlayerId"></strong></div>
     </header>
     <section class="node-stage event-stage">
       <article class="event-card panel">
         <span class="event-mark">?</span>
-        <p class="eyebrow">超市随机事件</p>
-        <h1 id="eventTitle">未命名事件 01</h1>
-        <p>事件内容与选项等待后续设计。</p>
-        <small>每次进入超市都会重新抽取1个事件槽位。</small>
-        <button id="leaveEvent" class="primary-button" type="button">继续前进</button>
+        <p class="eyebrow">校园偶遇</p>
+        <h1 id="eventTitle">随机事件</h1>
+        <p id="eventDescription"></p>
+        <small id="eventBalance"></small>
+        <div id="eventChoices" class="event-choices"></div>
       </article>
     </section>
   </main>
@@ -288,6 +290,32 @@
     </section>
   </div>
 
+  <div id="encyclopediaModal" class="modal" hidden>
+    <section class="modal-card encyclopedia-card" role="dialog" aria-modal="true" aria-labelledby="encyclopediaTitle">
+      <div class="deck-view-head">
+        <div><p class="eyebrow">游戏百科</p><h2 id="encyclopediaTitle">卡牌与圣遗物</h2></div>
+        <button id="closeEncyclopedia" class="text-button" type="button">关闭</button>
+      </div>
+      <div class="encyclopedia-tabs" role="tablist" aria-label="百科分类">
+        <button id="encyclopediaCardsTab" type="button" role="tab" aria-selected="true" aria-controls="encyclopediaCardsPanel">卡牌</button>
+        <button id="encyclopediaRelicsTab" type="button" role="tab" aria-selected="false" aria-controls="encyclopediaRelicsPanel">圣遗物</button>
+      </div>
+      <section id="encyclopediaCardsPanel" role="tabpanel" aria-labelledby="encyclopediaCardsTab">
+        <div class="encyclopedia-tools">
+          <label for="encyclopediaCardFilter">查看卡牌</label>
+          <select id="encyclopediaCardFilter"><option value="all">全部</option><option value="class">C部</option><option value="colorless">无色</option><option value="curse">厄运</option></select>
+          <button id="encyclopediaUpgrade" class="preview-toggle" type="button" aria-pressed="false">显示升级后效果</button>
+        </div>
+        <p id="encyclopediaCardCount" class="encyclopedia-count"></p>
+        <div id="encyclopediaCards" class="encyclopedia-grid"></div>
+      </section>
+      <section id="encyclopediaRelicsPanel" role="tabpanel" aria-labelledby="encyclopediaRelicsTab" hidden>
+        <p id="encyclopediaRelicCount" class="encyclopedia-count"></p>
+        <div id="encyclopediaRelics" class="encyclopedia-relic-grid"></div>
+      </section>
+    </section>
+  </div>
+
   <div id="utilityChoiceModal" class="modal" hidden>
     <section class="modal-card selection-card" role="dialog" aria-modal="true" aria-labelledby="utilityChoiceTitle">
       <p class="eyebrow">卡牌选择</p>
@@ -309,12 +337,12 @@
   </div>
 
   <div id="defeatModal" class="modal" hidden>
-    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="defeatTitle">
-      <p class="eyebrow">专注耗尽</p><h2 id="defeatTitle">需要重新作答</h2>
-      <p>调整打防顺序，重新挑战当前敌人。</p>
-      <button id="retryBattle" class="primary-button" type="button">重新挑战</button>
+    <section class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="defeatTitle">
+      <p class="eyebrow">战斗失败</p><h2 id="defeatTitle">定州中学吞噬了你......</h2>
+      <button id="returnAfterDefeat" class="primary-button" type="button">返回主界面</button>
     </section>
   </div>
+  <div id="statusTooltip" class="status-tooltip" role="tooltip" hidden><strong id="statusTooltipTitle"></strong><p id="statusTooltipText"></p></div>
   <script src="./app.js"></script>
 </body>
 </html>

@@ -29,7 +29,9 @@ const UPGRADES={
   grade_star:"若本回合打出过攻击牌和技能牌，下一回合获得1点行动力并额外抽1张牌。每回合最多触发1次。费用变为1。"
 };
 const TYPE_LABEL={attack:"攻击",skill:"技能",power:"天赋",curse:"厄运"};
+const DIVISION_LABEL={a:"A部",b:"B部",c:"C部",neutral:"无色"};
 const RARITY_LABEL={basic:"基础",common:"普通",uncommon:"罕见",rare:"稀有",curse:"厄运"};
+const cardDivision=def=>def.colorless||def.type==="curse"?"neutral":(["a","b","c"].includes(def.division)?def.division:"c");
 const CARDS={
   quick:{name:"快速作答",type:"attack",rarity:"basic",cost:1,text:"造成6点伤害。"},
   brainstorm:{name:"头脑风暴",type:"attack",rarity:"basic",cost:1,text:"造成8点伤害，给予2层思路。"},
@@ -289,7 +291,7 @@ function renderEncyclopedia(){
   $("encyclopediaUpgrade").textContent=encyclopediaUpgrade?"显示当前效果":"显示升级后效果";
   const cardIds=Object.keys(CARDS).filter(id=>{
     const def=CARDS[id];
-    return encyclopediaFilter==="all"||(encyclopediaFilter==="class"&&!def.colorless&&def.type!=="curse")||(encyclopediaFilter==="colorless"&&def.colorless)||(encyclopediaFilter==="curse"&&def.type==="curse");
+    return encyclopediaFilter==="all"||(encyclopediaFilter==="class"&&cardDivision(def)==="c")||(encyclopediaFilter==="a"&&cardDivision(def)==="a")||(encyclopediaFilter==="b"&&cardDivision(def)==="b")||(encyclopediaFilter==="colorless"&&def.colorless)||(encyclopediaFilter==="curse"&&def.type==="curse");
   });
   $("encyclopediaCardCount").textContent="共"+cardIds.length+"张卡牌 · 厄运卡不能升级";
   const cards=$("encyclopediaCards");cards.innerHTML="";
@@ -398,8 +400,8 @@ function renderShop(){
   $("shopMeal").textContent=run.meal;
   const cardHolder=$("classShopCards");cardHolder.innerHTML="";
   run.shop.cards.forEach(item=>{
-    const def=CARDS[item.id],box=document.createElement("article");box.className="shop-item"+(item.sold?" sold":"");
-    box.innerHTML='<span class="rarity-tag">'+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
+    const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");
+    box.innerHTML='<span class="rarity-tag">'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
     const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>buyClassCard(item));cardHolder.appendChild(box);
   });
   renderColorlessShop();renderRelicShop();
@@ -416,7 +418,7 @@ function buyClassCard(item){
 }
 function renderColorlessShop(){
   const holder=$("colorlessShopCards");holder.innerHTML="";
-  run.shop.colorless.forEach(item=>{const def=CARDS[item.id],box=document.createElement("article");box.className="shop-item colorless-card"+(item.sold?" sold":"");box.innerHTML='<small>'+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</small><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>{if(button.disabled)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop()});holder.appendChild(box)});
+  run.shop.colorless.forEach(item=>{const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item colorless-card division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");box.innerHTML='<small>'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</small><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>{if(button.disabled)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop()});holder.appendChild(box)});
 }
 function renderRelicShop(){
   const holder=$("relicShopItems");holder.innerHTML="";
@@ -881,10 +883,10 @@ function renderHand(){
   });
 }
 function createCardElement(inst,reward,staticPreview=false){
-  const def=CARDS[inst.id],button=document.createElement(staticPreview?"article":"button");if(!staticPreview)button.type="button";
-  button.className="battle-card "+(def.colorless?"colorless-card ":"class-card ")+def.type+(reward?" reward-card":"")+(inst.upgraded?" upgraded":"");
+  const def=CARDS[inst.id],division=cardDivision(def),button=document.createElement(staticPreview?"article":"button");if(!staticPreview)button.type="button";
+  button.className="battle-card "+(def.colorless?"colorless-card ":"class-card ")+"division-"+division+" "+def.type+" rarity-card-"+def.rarity+(reward?" reward-card":"")+(inst.upgraded?" upgraded":"");
   const rarity='<span class="rarity-'+def.rarity+'">'+RARITY_LABEL[def.rarity]+"</span>";
-  button.innerHTML='<span class="card-cost">'+(staticPreview?printedCost(inst):reward?def.cost:getCost(inst))+'</span><p class="card-meta">'+TYPE_LABEL[def.type]+" · "+rarity+"</p><h3>"+def.name+(inst.upgraded?"+":"")+'</h3><p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
+  button.innerHTML='<span class="card-cost">'+(staticPreview?printedCost(inst):reward?def.cost:getCost(inst))+'</span><span class="card-division">'+DIVISION_LABEL[division]+'</span><p class="card-meta"><span class="card-type-label">'+TYPE_LABEL[def.type]+'</span><span class="card-rarity">'+rarity+'</span></p><h3>'+def.name+(inst.upgraded?"+":"")+'</h3><p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
   return button;
 }
 function battleLog(text){$("battleLog").textContent=text}

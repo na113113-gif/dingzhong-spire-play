@@ -159,6 +159,45 @@
 @media(max-width:900px){.encyclopedia-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.encyclopedia-relic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.encyclopedia-card{width:100%;max-height:90dvh;padding:19px 13px max(18px,env(safe-area-inset-bottom));border-left:0;border-right:0;border-bottom:0;border-radius:16px 16px 0 0}.encyclopedia-grid,.encyclopedia-relic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.encyclopedia-grid .battle-card{min-height:180px;padding:12px 9px}.encyclopedia-tools .preview-toggle{margin-left:0}.encyclopedia-tabs button{flex:1}}
 .start-card .id-field{background:#07130fb8}.start-card .role-card{background:#112920b8}.start-card .role-card.selected{background:#173329c9}
+
+/* 纸面颜色表示归属；色带、边框、费用圆章和文字表示卡牌类型。 */
+.battle-card.division-c{--division-accent:#327e55;background:linear-gradient(155deg,#e5f4e8,#b5d4bf)}
+.battle-card.division-a{--division-accent:#ae5148;background:linear-gradient(155deg,#f7e5e0,#dfb1a7)}
+.battle-card.division-b{--division-accent:#416eac;background:linear-gradient(155deg,#e4eff9,#b6cee5)}
+.battle-card.division-neutral{--division-accent:#646a6b;background:linear-gradient(155deg,#f0f0ec,#c8cdcb)}
+.battle-card.attack{--type-accent:#a94339;--type-light:#d77868;border-color:#a94339}
+.battle-card.skill{--type-accent:#316e9b;--type-light:#7aabd0;border-color:#316e9b}
+.battle-card.power{--type-accent:#76518f;--type-light:#b98cce;border-color:#76518f}
+.battle-card.curse{--type-accent:#674058;--type-light:#ba849f;background:repeating-linear-gradient(125deg,#ffffff07 0 2px,transparent 2px 13px),linear-gradient(155deg,#493548,#332d3b 68%,#242d2b);border-color:#ba849f;color:#f3e7ef}
+.battle-card::before{content:"";position:absolute;top:0;left:0;right:0;height:7px;border-radius:9px 9px 0 0;background:linear-gradient(90deg,var(--type-accent),var(--type-light));pointer-events:none}
+.battle-card.curse::before{background:repeating-linear-gradient(135deg,var(--type-accent) 0 9px,var(--type-light) 9px 13px)}
+.battle-card .card-cost{background:var(--type-accent);border-color:var(--type-light)}
+.battle-card .card-division{position:absolute;top:13px;right:7px;padding:2px 6px;border:1px solid var(--division-accent);border-radius:99px;background:var(--division-accent);color:#fff;font-size:10px;font-weight:800;line-height:1.4;white-space:nowrap}
+.battle-card .card-meta{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:22px 0 12px;letter-spacing:0}
+.battle-card .card-type-label{display:inline-block;padding:3px 7px;border-radius:4px;background:var(--type-accent);color:#fff;font-size:11px;font-weight:800;white-space:nowrap}
+.battle-card.rarity-card-basic,.shop-item.rarity-item-basic{--rarity-accent:#747b7b;--rarity-pale:#e4e7e3;--rarity-shop:#bec8c4}
+.battle-card.rarity-card-common,.shop-item.rarity-item-common{--rarity-accent:#9b623c;--rarity-pale:#f4dfc8;--rarity-shop:#e3aa76}
+.battle-card.rarity-card-uncommon,.shop-item.rarity-item-uncommon{--rarity-accent:#287789;--rarity-pale:#d5edf1;--rarity-shop:#80cada}
+.battle-card.rarity-card-rare,.shop-item.rarity-item-rare{--rarity-accent:#a16b16;--rarity-pale:#fff0b8;--rarity-shop:#f3d27c}
+.battle-card.rarity-card-curse,.shop-item.rarity-item-curse{--rarity-accent:#976d88;--rarity-pale:#493849;--rarity-shop:#c59eb7}
+.battle-card::after{content:"";position:absolute;bottom:0;left:0;right:0;height:5px;border-radius:0 0 9px 9px;background:var(--rarity-accent);pointer-events:none}
+.battle-card.rarity-card-basic::after{background:repeating-linear-gradient(90deg,#747b7b 0 8px,#d9e0dc 8px 12px)}
+.battle-card.rarity-card-uncommon::after{background:linear-gradient(90deg,#287789,#9ad7dc,#287789)}
+.battle-card.rarity-card-rare::after{height:7px;background:linear-gradient(90deg,#9d6211,#ffe69b,#9d6211)}
+.battle-card.rarity-card-curse::after{background:repeating-linear-gradient(135deg,#674058 0 8px,#ba849f 8px 12px)}
+.battle-card .card-rarity{padding:2px 5px;border:1px solid var(--rarity-accent);border-radius:4px;background:var(--rarity-pale);color:var(--rarity-accent);font-size:10px;font-weight:800;white-space:nowrap}
+.battle-card .card-rarity span{color:inherit}
+.battle-card.rarity-card-rare .card-rarity{box-shadow:0 0 0 1px #fff7}
+.battle-card.rarity-card-curse .card-rarity{color:#f2cee4}
+.battle-card.curse .keyword{color:#f1b2c5}
+.shop-item.division-c{background:linear-gradient(145deg,#173a2c,#0b2119);border-color:#4b8b68}
+.shop-item.division-a{background:linear-gradient(145deg,#4b2927,#261715);border-color:#b46c62}
+.shop-item.division-b{background:linear-gradient(145deg,#263f59,#142432);border-color:#7398c5}
+.shop-item.division-neutral{background:linear-gradient(145deg,#393e3d,#202625);border-color:#858c8b}
+.shop-item.type-attack{border-left:4px solid #c66759}.shop-item.type-skill{border-left:4px solid #6ca4cb}.shop-item.type-power{border-left:4px solid #af84c7}
+.shop-item[class*="rarity-item-"]{border-bottom:4px solid var(--rarity-accent)}
+.shop-item[class*="rarity-item-"] :is(.rarity-tag,small){color:var(--rarity-shop);font-weight:800}
+@media(max-width:760px){.battle-card .card-meta{margin-bottom:9px}.battle-card .card-type-label{padding:2px 6px;font-size:10px}}
 .author-credit{margin:18px 0 0;text-align:center;color:#d7e2d9;font-size:14px;letter-spacing:.08em}
 @media(max-width:760px){.start-screen{padding-top:max(230px,28dvh,env(safe-area-inset-top));background-position:center,center top;background-size:cover,auto 70%}}
 
@@ -458,7 +497,7 @@
       <section id="encyclopediaCardsPanel" role="tabpanel" aria-labelledby="encyclopediaCardsTab">
         <div class="encyclopedia-tools">
           <label for="encyclopediaCardFilter">查看卡牌</label>
-          <select id="encyclopediaCardFilter"><option value="all">全部</option><option value="class">C部</option><option value="colorless">无色</option><option value="curse">厄运</option></select>
+          <select id="encyclopediaCardFilter"><option value="all">全部</option><option value="class">C部</option><option value="a">A部（待设计）</option><option value="b">B部（待设计）</option><option value="colorless">无色</option><option value="curse">厄运</option></select>
           <button id="encyclopediaUpgrade" class="preview-toggle" type="button" aria-pressed="false">显示升级后效果</button>
         </div>
         <p id="encyclopediaCardCount" class="encyclopedia-count"></p>
@@ -530,7 +569,9 @@ const UPGRADES={
   grade_star:"若本回合打出过攻击牌和技能牌，下一回合获得1点行动力并额外抽1张牌。每回合最多触发1次。费用变为1。"
 };
 const TYPE_LABEL={attack:"攻击",skill:"技能",power:"天赋",curse:"厄运"};
+const DIVISION_LABEL={a:"A部",b:"B部",c:"C部",neutral:"无色"};
 const RARITY_LABEL={basic:"基础",common:"普通",uncommon:"罕见",rare:"稀有",curse:"厄运"};
+const cardDivision=def=>def.colorless||def.type==="curse"?"neutral":(["a","b","c"].includes(def.division)?def.division:"c");
 const CARDS={
   quick:{name:"快速作答",type:"attack",rarity:"basic",cost:1,text:"造成6点伤害。"},
   brainstorm:{name:"头脑风暴",type:"attack",rarity:"basic",cost:1,text:"造成8点伤害，给予2层思路。"},
@@ -790,7 +831,7 @@ function renderEncyclopedia(){
   $("encyclopediaUpgrade").textContent=encyclopediaUpgrade?"显示当前效果":"显示升级后效果";
   const cardIds=Object.keys(CARDS).filter(id=>{
     const def=CARDS[id];
-    return encyclopediaFilter==="all"||(encyclopediaFilter==="class"&&!def.colorless&&def.type!=="curse")||(encyclopediaFilter==="colorless"&&def.colorless)||(encyclopediaFilter==="curse"&&def.type==="curse");
+    return encyclopediaFilter==="all"||(encyclopediaFilter==="class"&&cardDivision(def)==="c")||(encyclopediaFilter==="a"&&cardDivision(def)==="a")||(encyclopediaFilter==="b"&&cardDivision(def)==="b")||(encyclopediaFilter==="colorless"&&def.colorless)||(encyclopediaFilter==="curse"&&def.type==="curse");
   });
   $("encyclopediaCardCount").textContent="共"+cardIds.length+"张卡牌 · 厄运卡不能升级";
   const cards=$("encyclopediaCards");cards.innerHTML="";
@@ -899,8 +940,8 @@ function renderShop(){
   $("shopMeal").textContent=run.meal;
   const cardHolder=$("classShopCards");cardHolder.innerHTML="";
   run.shop.cards.forEach(item=>{
-    const def=CARDS[item.id],box=document.createElement("article");box.className="shop-item"+(item.sold?" sold":"");
-    box.innerHTML='<span class="rarity-tag">'+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
+    const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");
+    box.innerHTML='<span class="rarity-tag">'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
     const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>buyClassCard(item));cardHolder.appendChild(box);
   });
   renderColorlessShop();renderRelicShop();
@@ -917,7 +958,7 @@ function buyClassCard(item){
 }
 function renderColorlessShop(){
   const holder=$("colorlessShopCards");holder.innerHTML="";
-  run.shop.colorless.forEach(item=>{const def=CARDS[item.id],box=document.createElement("article");box.className="shop-item colorless-card"+(item.sold?" sold":"");box.innerHTML='<small>'+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</small><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>{if(button.disabled)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop()});holder.appendChild(box)});
+  run.shop.colorless.forEach(item=>{const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item colorless-card division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");box.innerHTML='<small>'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</small><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>{if(button.disabled)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop()});holder.appendChild(box)});
 }
 function renderRelicShop(){
   const holder=$("relicShopItems");holder.innerHTML="";
@@ -1382,10 +1423,10 @@ function renderHand(){
   });
 }
 function createCardElement(inst,reward,staticPreview=false){
-  const def=CARDS[inst.id],button=document.createElement(staticPreview?"article":"button");if(!staticPreview)button.type="button";
-  button.className="battle-card "+(def.colorless?"colorless-card ":"class-card ")+def.type+(reward?" reward-card":"")+(inst.upgraded?" upgraded":"");
+  const def=CARDS[inst.id],division=cardDivision(def),button=document.createElement(staticPreview?"article":"button");if(!staticPreview)button.type="button";
+  button.className="battle-card "+(def.colorless?"colorless-card ":"class-card ")+"division-"+division+" "+def.type+" rarity-card-"+def.rarity+(reward?" reward-card":"")+(inst.upgraded?" upgraded":"");
   const rarity='<span class="rarity-'+def.rarity+'">'+RARITY_LABEL[def.rarity]+"</span>";
-  button.innerHTML='<span class="card-cost">'+(staticPreview?printedCost(inst):reward?def.cost:getCost(inst))+'</span><p class="card-meta">'+TYPE_LABEL[def.type]+" · "+rarity+"</p><h3>"+def.name+(inst.upgraded?"+":"")+'</h3><p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
+  button.innerHTML='<span class="card-cost">'+(staticPreview?printedCost(inst):reward?def.cost:getCost(inst))+'</span><span class="card-division">'+DIVISION_LABEL[division]+'</span><p class="card-meta"><span class="card-type-label">'+TYPE_LABEL[def.type]+'</span><span class="card-rarity">'+rarity+'</span></p><h3>'+def.name+(inst.upgraded?"+":"")+'</h3><p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
   return button;
 }
 function battleLog(text){$("battleLog").textContent=text}

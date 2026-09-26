@@ -277,7 +277,7 @@
             <div id="mapNodes"></div>
           </div>
         </div>
-        <p class="map-tip" id="mapTip">选择底部任一亮起的节点开始。进入节点后，只能沿连线继续向上。</p>
+        <p class="map-tip" id="mapTip">底部的起点均为上课，选择任意一条路线开始战斗。</p>
       </section>
       <aside class="legend-panel panel">
         <p class="eyebrow">节点类型</p><h2>高一校园</h2>
@@ -676,6 +676,7 @@ function showOnly(id){
   ["startScreen","mapScreen","battleScreen","rewardScreen","relicRewardScreen","dormScreen","canteenScreen","eventScreen","sportScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
 }
 function randomType(row){
+  if(row===0)return "battle";
   const pool=row<3?["battle","battle","battle","event"]:["battle","battle","battle","exam","exam","dorm","canteen","event","sport"];
   return pool[Math.floor(Math.random()*pool.length)];
 }
@@ -714,7 +715,7 @@ function createMap(){
   $("bossPreview").textContent="本层期末："+ENCOUNTERS[boss.encounterId].name;
   renderMap();updateRunHud();
   $("floorText").textContent="入口";$("routeStatus").textContent="从教学楼入口出发";
-  $("mapTip").textContent="选择底部任一亮起的节点开始。进入上课节点将触发随堂小测。";
+  $("mapTip").textContent="底部的起点均为上课，选择任意一条路线开始战斗。";
   requestAnimationFrame(()=>{$("mapViewport").scrollTop=$("mapViewport").scrollHeight});
 }
 function addEdge(edges,a,b){if(!edges.some(edge=>edge.from===a.id&&edge.to===b.id))edges.push({from:a.id,to:b.id})}

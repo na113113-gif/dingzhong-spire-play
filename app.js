@@ -74,11 +74,13 @@ const CARDS={
   universal_method:{name:"万能答题法",type:"skill",rarity:"rare",cost:2,text:"从抽牌堆选择1张牌加入手牌。该牌本回合费用变为0。",keyword:"消耗",exhaust:true,colorless:true},
   grade_star:{name:"年级之星",type:"power",rarity:"rare",cost:2,text:"若本回合打出过攻击牌和技能牌，下一回合获得1点行动力并额外抽1张牌。每回合最多触发1次。",colorless:true},
   forgotten_homework:{name:"没带作业",type:"curse",rarity:"curse",cost:"—",text:"不能打出。回合结束时若仍在手牌中，失去3专注。",keyword:"厄运"},
-  sleepy:{name:"昨晚没睡好",type:"curse",rarity:"curse",cost:"—",text:"不能打出。抽到时失去2专注。",keyword:"厄运"},
-  spilled_ink:{name:"洒了的墨水",type:"curse",rarity:"curse",cost:"—",text:"不能打出。抽到时随机弃掉另外1张手牌。",keyword:"厄运"},
+  sleepy:{name:"失眠症",type:"curse",rarity:"curse",cost:"—",text:"不能打出。抽到时失去2专注。",keyword:"厄运"},
+  spilled_ink:{name:"墨泻千里",type:"curse",rarity:"curse",cost:"—",text:"不能打出。抽到时随机弃掉另外1张手牌。",keyword:"厄运"},
   brain_knot:{name:"脑子打结",type:"curse",rarity:"curse",cost:"—",text:"不能打出。抽到时获得1层紧张。",keyword:"厄运"},
-  lost_meal_card:{name:"饭卡找不到了",type:"curse",rarity:"curse",cost:"—",text:"不能打出。只要留在牌组中，每次战斗胜利获得的饭卡减少10，最低减至0。",keyword:"厄运"}
+  lost_meal_card:{name:"饭卡无了",type:"curse",rarity:"curse",cost:"—",text:"不能打出。只要留在牌组中，每次战斗胜利获得的饭卡减少10，最低减至0。",keyword:"厄运"}
 };
+const CARD_ART=Object.fromEntries(Object.keys(CARDS).map(id=>[id,"./assets/cards/"+id+".webp"]));
+function cardArtMarkup(id){return '<img class="card-art" src="'+CARD_ART[id]+'" alt="" width="512" height="512" loading="lazy" decoding="async" draggable="false">'}
 const RELICS={
   ring:{name:"戒指",rarity:"common",text:"每场战斗中，专注首次降至上限的50%或以下时，获得12点防御。"},
   rose:{name:"玫瑰花",rarity:"common",text:"在宿舍选择休息时，额外恢复专注上限的5%。"},
@@ -136,6 +138,7 @@ function showOnly(id){
   ["startScreen","mapScreen","battleScreen","rewardScreen","relicRewardScreen","dormScreen","canteenScreen","eventScreen","sportScreen"].forEach(screen=>{$(screen).hidden=screen!==id});
 }
 function randomType(row){
+  if(row===0)return "battle";
   const pool=row<3?["battle","battle","battle","event"]:["battle","battle","battle","exam","exam","dorm","canteen","event","sport"];
   return pool[Math.floor(Math.random()*pool.length)];
 }
@@ -174,7 +177,7 @@ function createMap(){
   $("bossPreview").textContent="本层期末："+ENCOUNTERS[boss.encounterId].name;
   renderMap();updateRunHud();
   $("floorText").textContent="入口";$("routeStatus").textContent="从教学楼入口出发";
-  $("mapTip").textContent="选择底部任一亮起的节点开始。进入上课节点将触发随堂小测。";
+  $("mapTip").textContent="底部的起点均为上课，选择任意一条路线开始战斗。";
   requestAnimationFrame(()=>{$("mapViewport").scrollTop=$("mapViewport").scrollHeight});
 }
 function addEdge(edges,a,b){if(!edges.some(edge=>edge.from===a.id&&edge.to===b.id))edges.push({from:a.id,to:b.id})}
@@ -401,7 +404,7 @@ function renderShop(){
   const cardHolder=$("classShopCards");cardHolder.innerHTML="";
   run.shop.cards.forEach(item=>{
     const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");
-    box.innerHTML='<span class="rarity-tag">'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
+    box.innerHTML='<span class="rarity-tag">'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</span><h3>'+def.name+'</h3>'+cardArtMarkup(item.id)+'<p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';
     const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>buyClassCard(item));cardHolder.appendChild(box);
   });
   renderColorlessShop();renderRelicShop();
@@ -418,7 +421,7 @@ function buyClassCard(item){
 }
 function renderColorlessShop(){
   const holder=$("colorlessShopCards");holder.innerHTML="";
-  run.shop.colorless.forEach(item=>{const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item colorless-card division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");box.innerHTML='<small>'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</small><h3>'+def.name+'</h3><p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>{if(button.disabled)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop()});holder.appendChild(box)});
+  run.shop.colorless.forEach(item=>{const def=CARDS[item.id],division=cardDivision(def),box=document.createElement("article");box.className="shop-item colorless-card division-"+division+" type-"+def.type+" rarity-item-"+item.rarity+(item.sold?" sold":"");box.innerHTML='<small>'+DIVISION_LABEL[division]+' · '+RARITY_LABEL[item.rarity]+' · '+TYPE_LABEL[def.type]+'</small><h3>'+def.name+'</h3>'+cardArtMarkup(item.id)+'<p>'+def.text+'</p><div class="shop-bottom"><span class="shop-price">'+item.price+'</span><button class="shop-buy" type="button">'+(item.sold?"已购买":"购买")+'</button></div>';const button=box.querySelector("button");button.disabled=item.sold||run.meal<item.price;button.addEventListener("click",()=>{if(button.disabled)return;run.meal-=item.price;run.deck.push(makeDeckEntry(item.id));item.sold=true;renderShop()});holder.appendChild(box)});
 }
 function renderRelicShop(){
   const holder=$("relicShopItems");holder.innerHTML="";
@@ -499,17 +502,17 @@ const EVENTS=[
   {id:"water_spill",title:"水杯倒在作业上",story:"“完了，刚写完的那页。”",choices:[
     eventOption("去复印","花35饭卡，平安无事。",()=>{run.meal-=35;eventDone("复印好了作业，花了35饭卡。")},()=>run.meal>=35),
     eventOption("重新写","失去8专注。",()=>{loseEventHp(8);eventDone("重新写完作业，失去8专注。")},()=>canLoseEventHp(8)),
-    eventOption("先晾着","获得厄运卡“洒了的墨水”。",()=>eventDone("作业还没干，牌组加入“"+addEventCard("spilled_ink")+"”。"))]},
+    eventOption("先晾着","获得厄运卡“墨泻千里”。",()=>eventDone("作业还没干，牌组加入“"+addEventCard("spilled_ink")+"”。"))]},
   {id:"homework",title:"课代表已经走到门口",story:"你才想起作业还在宿舍。",choices:[
     eventOption("跑回去拿","失去10专注。",()=>{loseEventHp(10);eventDone("跑回宿舍拿了作业，失去10专注。")},()=>canLoseEventHp(10)),
     eventOption("赌今天不查","获得30饭卡，同时获得厄运卡“没带作业”。",()=>{run.meal+=30;addEventCard("forgotten_homework");eventDone("省下了早饭钱，获得30饭卡；牌组加入“没带作业”。")})]},
   {id:"dorm_noodles",title:"宿舍里有人煮泡面",story:"有人举着叉子问：“要不要来一口？”",choices:[
     eventOption("蹭一碗","花20饭卡，回复12专注。",()=>{run.meal-=20;eventDone("吃完泡面，回复"+healEventHp(12)+"专注。")},()=>run.meal>=20),
-    eventOption("聊到熄灯后","回复20专注，获得厄运卡“昨晚没睡好”。",()=>{const healed=healEventHp(20);addEventCard("sleepy");eventDone("回复"+healed+"专注；牌组加入“昨晚没睡好”。")}),
+    eventOption("聊到熄灯后","回复20专注，获得厄运卡“失眠症”。",()=>{const healed=healEventHp(20);addEventCard("sleepy");eventDone("回复"+healed+"专注；牌组加入“失眠症”。")}),
     eventOption("继续睡","回复5专注。",()=>eventDone("你翻个身，回复"+healEventHp(5)+"专注。"))]},
   {id:"card_error",title:"饭卡怎么刷都没反应",story:"后面已经排了好几个人。",choices:[
     eventOption("去窗口处理","失去5专注，获得25饭卡。",()=>{loseEventHp(5);run.meal+=25;eventDone("窗口补好了余额，获得25饭卡。")},()=>canLoseEventHp(5)),
-    eventOption("先借同学的钱吃饭","回复10专注，获得厄运卡“饭卡找不到了”。",()=>{const healed=healEventHp(10);addEventCard("lost_meal_card");eventDone("回复"+healed+"专注；牌组加入“饭卡找不到了”。")}),
+    eventOption("先借同学的钱吃饭","回复10专注，获得厄运卡“饭卡无了”。",()=>{const healed=healEventHp(10);addEventCard("lost_meal_card");eventDone("回复"+healed+"专注；牌组加入“饭卡无了”。")}),
     eventOption("不吃了","失去4专注。",()=>{loseEventHp(4);eventDone("没吃上饭，失去4专注。")},()=>canLoseEventHp(4))]},
   {id:"old_exam",title:"抽屉里翻出旧卷子",story:"上面居然有一道现在还不会的题。",choices:[
     eventOption("认真看一遍","升级1张技能牌，获得厄运卡“脑子打结”。",()=>openEventDeckChoice("认真看一遍","选择1张技能牌升级。",entry=>!entry.upgraded&&CARDS[entry.id].type==="skill",entry=>{entry.upgraded=true;addEventCard("brain_knot");eventDone("升级了“"+CARDS[entry.id].name+"”；牌组加入“脑子打结”。")}),()=>run.deck.some(entry=>!entry.upgraded&&CARDS[entry.id].type==="skill")),
@@ -517,7 +520,7 @@ const EVENTS=[
     eventOption("塞回抽屉","无事发生。",()=>eventDone("旧卷子又回到了抽屉里。"))]},
   {id:"rain",title:"下雨了，衣服还晾着",story:"窗外的雨下得比你跑得快。",choices:[
     eventOption("冲回宿舍","失去7专注，获得20饭卡。",()=>{loseEventHp(7);run.meal+=20;eventDone("收好衣服，还在兜里找到20饭卡。")},()=>canLoseEventHp(7)),
-    eventOption("等雨停再说","获得厄运卡“昨晚没睡好”。",()=>eventDone("晚上还得重新晾，牌组加入“"+addEventCard("sleepy")+"”。")),
+    eventOption("等雨停再说","获得厄运卡“失眠症”。",()=>eventDone("晚上还得重新晾，牌组加入“"+addEventCard("sleepy")+"”。")),
     eventOption("请室友帮忙","花30饭卡，平安无事。",()=>{run.meal-=30;eventDone("室友帮你收好了衣服。")},()=>run.meal>=30)]},
   {id:"desk_bag",title:"同桌整理书包",story:"他递来一叠“你先拿着”的资料。",choices:[
     eventOption("整叠收下","从3张普通C部卡中选1张，同时获得1张随机厄运卡。",()=>offerEventCards("common",()=>true,()=>{const curse=randomFrom(CURSE_IDS);addEventCard(curse);return "，同时获得厄运卡“"+CARDS[curse].name+"”"})),
@@ -886,7 +889,7 @@ function createCardElement(inst,reward,staticPreview=false){
   const def=CARDS[inst.id],division=cardDivision(def),button=document.createElement(staticPreview?"article":"button");if(!staticPreview)button.type="button";
   button.className="battle-card "+(def.colorless?"colorless-card ":"class-card ")+"division-"+division+" "+def.type+" rarity-card-"+def.rarity+(reward?" reward-card":"")+(inst.upgraded?" upgraded":"");
   const rarity='<span class="rarity-'+def.rarity+'">'+RARITY_LABEL[def.rarity]+"</span>";
-  button.innerHTML='<span class="card-cost">'+(staticPreview?printedCost(inst):reward?def.cost:getCost(inst))+'</span><span class="card-division">'+DIVISION_LABEL[division]+'</span><p class="card-meta"><span class="card-type-label">'+TYPE_LABEL[def.type]+'</span><span class="card-rarity">'+rarity+'</span></p><h3>'+def.name+(inst.upgraded?"+":"")+'</h3><p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
+  button.innerHTML='<span class="card-cost">'+(staticPreview?printedCost(inst):reward?def.cost:getCost(inst))+'</span><span class="card-division">'+DIVISION_LABEL[division]+'</span><p class="card-meta"><span class="card-type-label">'+TYPE_LABEL[def.type]+'</span><span class="card-rarity">'+rarity+'</span></p><h3>'+def.name+(inst.upgraded?"+":"")+'</h3>'+cardArtMarkup(inst.id)+'<p class="card-text">'+(inst.upgraded?UPGRADES[inst.id]:def.text)+(def.keyword?'<span class="keyword">'+def.keyword+"</span>":"")+"</p>";
   return button;
 }
 function battleLog(text){$("battleLog").textContent=text}

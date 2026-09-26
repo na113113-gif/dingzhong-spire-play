@@ -189,4 +189,20 @@
 .shop-item[class*="rarity-item-"] :is(.rarity-tag,small){color:var(--rarity-shop);font-weight:800}
 @media(max-width:760px){.battle-card .card-meta{margin-bottom:9px}.battle-card .card-type-label{padding:2px 6px;font-size:10px}}
 .author-credit{margin:18px 0 0;text-align:center;color:#d7e2d9;font-size:14px;letter-spacing:.08em}
+/* 插画位于名称与效果之间，保留归属底色、类型色带和稀有度边框。 */
+.battle-card .card-art{display:block;width:100%;height:92px;object-fit:cover;object-position:center 38%;margin:0 0 10px;border:1px solid var(--division-accent);border-radius:5px;background:#eceee7;pointer-events:none}
+.battle-card h3{margin-bottom:8px}
+.battle-card .card-text{overflow-wrap:anywhere}
+.shop-item .card-art{display:block;width:100%;height:140px;object-fit:cover;object-position:center 38%;margin:3px 0 12px;border-radius:6px;background:#eceee7}
+.reward-option .battle-card .card-art{height:132px}
+.encyclopedia-grid .battle-card .card-art,.deck-view-grid .battle-card .card-art,.collection-grid .battle-card .card-art{height:116px}
+@media(max-width:760px){
+  .battle-hand .battle-card .card-art{height:62px;margin-bottom:7px}
+  .battle-hand .battle-card h3{font-size:14px;margin-bottom:6px}
+  .battle-hand .battle-card .card-meta{gap:2px;margin-bottom:7px}
+  .battle-hand .battle-card .card-type-label,.battle-hand .battle-card .card-rarity{padding-left:4px;padding-right:4px}
+  .encyclopedia-grid .battle-card .card-art,.deck-view-grid .battle-card .card-art,.collection-grid .battle-card .card-art{height:92px}
+  .reward-option .battle-card .card-art{height:100px}
+  .shop-item .card-art{height:160px}
+}
 @media(max-width:760px){.start-screen{padding-top:max(230px,28dvh,env(safe-area-inset-top));background-position:center,center top;background-size:cover,auto 70%}}

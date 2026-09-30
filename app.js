@@ -399,16 +399,8 @@ function updateRunHud(){
 function enterGame(id){
   navigationEpoch++;battle=null;selection=null;pendingReward=null;pendingRelic=null;deckAction=null;utilityChoice=null;currentEvent=null;run.pendingNode=null;
   startPlayTime();
-  run.practiceExam=false;
   run.id=id;run.floor=1;run.deck=STARTER_DECK.map(makeDeckEntry);run.hp=80;run.maxHp=80;run.meal=400;run.strength=0;run.dexterity=0;run.relics=[];run.battleCount=0;run.dormVisits=0;run.bingeCount=0;run.shop=null;run.eventSeen=[];run.nextBattleDraw=0;run.nextBattleFrail=0;run.nextBattleEnergy=0;run.nextBattleBlock=0;run.nextBattleWeak=0;$("midDecisionModal").hidden=true;
   $("displayId").textContent=id;$("battlePlayerId").textContent=id;$("dormPlayerId").textContent=id;$("eventPlayerId").textContent=id;$("sportPlayerId").textContent=id;showOnly("mapScreen");createMap();
-}
-function startExamPreview(){
-  const id=$("playerId").value.trim()||"试玩学生";
-  $("examPreviewResult").textContent="";
-  enterGame(id);run.floor=2;run.practiceExam=true;
-  run.pendingNode={type:"exam",encounterId:"g2_final"};
-  startBattle("exam");
 }
 function backToStart(){navigationEpoch++;battle=null;stopPlayTime();showOnly("startScreen");$("finishModal").hidden=true;$("playerId").focus()}
 
@@ -816,8 +808,7 @@ function chooseDecision(id){
 function startBattle(kind){
   const grade1Choice=hasRelic("grade1_relic");
   const encounterId=run.pendingNode?.encounterId||rollEncounter(kind);
-  const practiceExam=!!run.practiceExam&&encounterId==="g2_final";
-  const enemy=practiceExam?{...ENCOUNTERS.g2_final,name:"限时月考 · 交卷试行",hp:90,note:"完成40%后可以交卷；越晚交卷，奖励越好，但攻击压力会逐渐增加。",moves:[{name:"审题",damage:6,hits:1},{name:"题量增加",damage:8,hits:1,block:6},{name:"时间提醒",damage:10,hits:1},{name:"最后一页",damage:12,hits:1}]}:ENCOUNTERS[encounterId];if(!enemy)return;
+  const enemy=ENCOUNTERS[encounterId];if(!enemy)return;
   const examSubmission=enemy.kind==="exam"&&[1,2].includes(run.floor);
   const enemyMultiplier=hasRelic("clock_delivery")&&["exam","boss"].includes(enemy.kind)?1.1:1;
   const enemyHp=enemyMultiplier===1?enemy.hp:Math.floor(enemy.hp*11/10);
@@ -1372,7 +1363,6 @@ function claimRelicReward(skip=false){
 function completeBattleRewards(message){
   run.battleCount++;let extra="";
   if(hasRelic("transcript")&&run.battleCount%3===0){const pool=run.deck.filter(card=>!card.upgraded&&CARDS[card.id].type!=="curse");if(pool.length){const card=pool[Math.floor(Math.random()*pool.length)];card.upgraded=true;extra=" 成绩单将“"+CARDS[card.id].name+"”升级了。"}}
-  if(run.practiceExam){backToStart();$("examPreviewResult").textContent="交卷试玩完成："+message+extra+" 本次奖励不保存。";return}
   finishNode(message+extra);
   if(battle.kind==="boss"&&run.floor<=2){$("finishTitle").textContent=(run.floor===1?"高一":"高二")+"学年通关";$("finishSummary").textContent="你击败了“"+battle.enemy.name+"”，完成了本层期末考试。";$("restartMap").textContent=run.floor===1?"进入高二":"进入高三（待设计）";$("finishModal").hidden=false}
 }
@@ -1384,7 +1374,6 @@ function advanceToNextFloor(){
 $("startForm").addEventListener("submit",event=>{event.preventDefault();const id=$("playerId").value.trim();if(!id){$("formError").textContent="请输入学生 ID 后开始游戏";$("playerId").focus();return}$("formError").textContent="";enterGame(id)});
 $("playerId").addEventListener("input",()=>{$("formError").textContent=""});
 $("openEncyclopedia").addEventListener("click",openEncyclopedia);
-$("tryExamSubmit").addEventListener("click",startExamPreview);
 $("closeEncyclopedia").addEventListener("click",closeEncyclopedia);
 $("encyclopediaCardsTab").addEventListener("click",()=>{encyclopediaTab="cards";renderEncyclopedia()});
 $("encyclopediaRelicsTab").addEventListener("click",()=>{encyclopediaTab="relics";renderEncyclopedia()});

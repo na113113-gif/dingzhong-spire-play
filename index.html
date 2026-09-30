@@ -3,24 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10251f">
-  <meta name="description" content="定州中学校园题材卡牌游戏，45张独特手绘卡面。">
-  <title>定中尖塔 v0.0.3</title>
+  <meta name="theme-color" content="#f4efdf">
+  <meta name="description" content="定州中学校园题材卡牌游戏，探索高一、高二的随机路线与卡牌构筑。">
+  <title>定中尖塔 v0.0.4</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23112620'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='%23f5d06f' font-family='serif'%3E定%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <aside class="game-clock" aria-label="当前真实时间">
-    <span>真实时间</span>
-    <strong id="realTime">00:00:00</strong>
-    <small id="realDate">0000年00月00日</small>
+  <aside class="game-clock" aria-label="真实时间与本局游玩时间">
+    <div class="clock-section clock-real">
+      <span>真实时间</span>
+      <strong id="realTime">00:00:00</strong>
+      <small id="realDate">0000年00月00日</small>
+    </div>
+    <div class="clock-section clock-play">
+      <span>游玩时间</span>
+      <strong id="playTime">00:00:00</strong>
+      <small>本局累计 · 切到后台时暂停</small>
+    </div>
   </aside>
   <main id="startScreen" class="start-screen">
     <section class="start-card" aria-labelledby="gameTitle">
       <div class="seal" aria-hidden="true">定</div>
       <p class="eyebrow">校园牌组构筑游戏</p>
       <h1 id="gameTitle">定中尖塔</h1>
-      <p class="chapter">v0.0.3 · 第1层 · 高一</p>
+      <p class="chapter">v0.0.4 · 第1层 · 高一</p>
       <form id="startForm" novalidate>
         <label class="id-field" for="playerId"><span>学生 ID</span><input id="playerId" name="playerId" maxlength="16" autocomplete="off" placeholder="输入你的 ID" aria-describedby="idHint"></label>
         <p id="idHint" class="field-hint">ID 仅用于本次游戏显示</p>
@@ -44,14 +51,16 @@
         <button class="primary-button" type="submit">开始游戏</button>
       </form>
       <button id="openEncyclopedia" class="deck-button encyclopedia-entry" type="button">查看卡牌与圣遗物百科</button>
+      <button id="tryExamSubmit" class="deck-button exam-preview-entry" type="button">试玩：高二月考 · 交卷抉择</button>
+      <p id="examPreviewResult" class="exam-preview-result" aria-live="polite"></p>
       <p class="author-credit">作者：艾萨克·牛顿</p>
     </section>
   </main>
 
   <main id="mapScreen" class="map-screen" hidden>
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small>第一层 · 高一</small></div></div>
-      <div class="route-title"><small>路线规划</small><strong id="routeStatus">从教学楼入口出发</strong></div>
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small id="mapSchoolYear">第1层 · 高一</small></div></div>
+      <span id="routeStatus" hidden aria-hidden="true"></span>
       <button id="newRun" class="text-button" type="button">返回选角</button>
     </header>
     <div class="map-layout">
@@ -75,8 +84,14 @@
         <button id="inspectRelics" class="deck-button relic-detail-button" type="button">查看圣遗物详情</button>
       </aside>
       <section class="map-panel panel" aria-labelledby="mapTitle">
-        <div class="map-heading"><div><p class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1><p id="bossPreview" class="boss-preview"></p></div></div>
-        <p class="map-tip">由下向上前进 · 金色线可走 · 浅绿色线已走<br>触摸未解锁节点或悬停查看相连路线；点击亮起节点进入。</p>
+        <div class="map-heading"><div><p id="mapFloorLabel" class="eyebrow">高一学年</p><h1 id="mapTitle">选择前进路线</h1><p id="bossPreview" class="boss-preview"></p></div></div>
+        <div id="debugControls" class="debug-controls" hidden>
+          <strong>调试入口 · dzzx</strong>
+          <label for="debugFloor">直接进入</label>
+          <select id="debugFloor"><option value="1">第1层 · 高一</option><option value="2">第2层 · 高二</option><option value="3">第3层 · 高三（待设计）</option></select>
+          <small>所有节点均可点击及重复进入；切层保留角色进度，重置地图。未完成战斗不发奖励。</small>
+        </div>
+        <p class="map-tip">由下向上前进 · 赭金色线可走 · 浅绿色线已走<br>触摸未解锁节点或悬停查看相连路线；点击亮起节点进入。</p>
         <div id="mapViewport" class="map-viewport">
           <div id="mapCanvas" class="map-canvas" aria-label="随机生成的一层路线地图">
             <svg id="routeLines" class="route-lines" aria-hidden="true"></svg>
@@ -88,13 +103,13 @@
       <aside class="legend-panel panel">
         <p class="eyebrow">节点类型</p><h2>高一校园</h2>
         <ul class="legend-list">
-          <li><span class="node-sample battle">课</span><div><strong>上课</strong><small>战斗节点</small></div></li>
-          <li><span class="node-sample exam">月</span><div><strong>月考</strong><small>精英战斗节点</small></div></li>
-          <li><span class="node-sample dorm">舍</span><div><strong>宿舍</strong><small>休整节点</small></div></li>
-          <li><span class="node-sample canteen">食</span><div><strong>食堂</strong><small>采购节点</small></div></li>
-          <li><span class="node-sample event">超</span><div><strong>超市</strong><small>随机节点</small></div></li>
-          <li><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
-          <li><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
+          <li data-node-type="battle" tabindex="0"><span class="node-sample battle">课</span><div><strong>上课</strong><small>战斗节点</small></div></li>
+          <li data-node-type="exam" tabindex="0"><span class="node-sample exam">月</span><div><strong>月考</strong><small>精英战斗节点</small></div></li>
+          <li data-node-type="dorm" tabindex="0"><span class="node-sample dorm">舍</span><div><strong>宿舍</strong><small>休整节点</small></div></li>
+          <li data-node-type="canteen" tabindex="0"><span class="node-sample canteen">食</span><div><strong>食堂</strong><small>采购节点</small></div></li>
+          <li data-node-type="event" tabindex="0"><span class="node-sample event">超</span><div><strong>超市</strong><small>随机节点</small></div></li>
+          <li data-node-type="sport" tabindex="0"><span class="node-sample sport">体</span><div><strong>操场</strong><small>体育节点</small></div></li>
+          <li data-node-type="boss" tabindex="0"><span class="node-sample boss">期</span><div><strong>期末</strong><small>本层 Boss</small></div></li>
         </ul>
         <div class="placeholder-note"><strong>当前版本</strong><p>上课与月考各有3种敌人。期末随机生成主课＋文科、主课＋理科或主课＋体育的1种 Boss。</p></div>
       </aside>
@@ -109,7 +124,7 @@
     </header>
     <section class="node-stage">
       <div class="node-intro"><p class="eyebrow">宿舍节点</p><h1>在下一节课前做出选择</h1><p id="dormStatus">安静的宿舍里，时间只够完成1件事。</p></div>
-      <div class="choice-grid">
+      <div class="choice-grid dorm-choice-grid">
         <article class="choice-card rest-choice">
           <span class="choice-mark">休</span><p class="eyebrow" id="restCycleLabel">午休</p><h2>休息</h2>
           <p>恢复专注上限的 <strong id="restPercent">25%</strong>。</p><small id="restPreview">预计恢复 10 点专注</small>
@@ -119,6 +134,11 @@
           <span class="choice-mark">修</span><p class="eyebrow">挑灯修读</p><h2>升级1张卡牌</h2>
           <p>从当前牌组选择1张尚未升级的卡牌，强化至本次游戏结束。</p><small>已升级的卡牌会显示“+”</small>
           <button id="chooseUpgrade" class="primary-button" type="button">选择卡牌</button>
+        </article>
+        <article class="choice-card revise-choice">
+          <span class="choice-mark">订</span><p class="eyebrow">错题订正</p><h2>移除1张错题</h2>
+          <p>从当前牌组中选1张错题，永久移除。与休息、升级只能选择1项。</p><small id="revisePreview">当前有0张错题。</small>
+          <button id="chooseRevise" class="primary-button" type="button" disabled>选择错题</button>
         </article>
       </div>
     </section>
@@ -151,10 +171,38 @@
         <span class="event-mark">?</span>
         <p class="eyebrow">校园偶遇</p>
         <h1 id="eventTitle">随机事件</h1>
+        <img id="eventArt" class="event-scene-art" alt="" width="512" height="512" hidden>
         <p id="eventDescription"></p>
         <small id="eventBalance"></small>
         <div id="eventChoices" class="event-choices"></div>
       </article>
+    </section>
+  </main>
+
+  <div id="midDecisionModal" class="modal" hidden>
+    <section class="modal-card mid-decision-card" role="dialog" aria-modal="true" aria-labelledby="midDecisionTitle">
+      <p class="eyebrow">高二 · 中途必经节点</p><h2 id="midDecisionTitle">抉择</h2>
+      <p>一轮复习开始了</p>
+      <div class="decision-options">
+        <button id="continueMidDecision" type="button"><strong>保持现状</strong><span>无效果</span></button>
+        <button id="midSprint" type="button"><strong>冲刺！冲刺！冲！</strong><span id="midSprintArt"></span><span>获得圣遗物「冲刺！」</span><small>每场战斗开始时，失去2点专注，本场获得1点力量。</small></button>
+        <button id="midClockDelivery" type="button"><strong>大摆钟下寄快递</strong><span id="midClockDeliveryArt"></span><span>获得圣遗物「上面开摆下面寄」</span><small>每场战斗胜利结束时，回复2点专注；期末与月考敌人的专注上限及伤害提升10%（向下取整）。</small></button>
+      </div>
+    </section>
+  </div>
+  <main id="decisionScreen" class="node-screen decision-screen" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">定</span><div><strong>定中尖塔</strong><small id="decisionYear">高二 · 学年入口</small></div></div>
+      <div class="route-title"><small>必经节点</small><strong>抉择，抉择</strong></div>
+      <div class="battle-header-id">ID　<strong id="decisionPlayerId"></strong></div>
+    </header>
+    <section class="node-stage decision-stage">
+      <div class="node-intro"><p class="eyebrow">新学年 · 抉择，抉择</p><h1>抉择，抉择</h1><p id="decisionStory">我我我我我我去我我我我我我靠，我还啥也没学呢怎么就高二了😭</p></div>
+      <div class="decision-options">
+        <button id="decisionPen" type="button" data-decision="endless_pen"><strong>此为，我的决意</strong><span id="decisionPenArt"></span><span>获得圣遗物「永不断墨的钢笔」</span><small>以至少1点行动力结束回合时，下回合获得2点行动力。</small></button>
+        <button id="decisionSunMoon" type="button" data-decision="sun_moon"><strong>此夜，星海澈明</strong><span id="decisionSunMoonArt"></span><span>获得圣遗物「日月同辉」</span><small>每场战斗每打出7张牌，本场获得1点力量和1点敏捷。</small></button>
+        <button id="decisionCard" type="button" data-decision="without_blame"><strong>天予不取</strong><span>获得已升级的无色技能牌「不受其咎」</span><small>1费 · 本场获得15点刚毅。卡面暂时留白。</small></button>
+      </div>
     </section>
   </main>
 
@@ -199,11 +247,13 @@
           <p id="intentText">造成6点压力</p>
         </div>
         <article id="quizEnemy" class="quiz-enemy">
+          <img id="enemyArt" class="enemy-art" src="./assets/enemies/quiz.webp" alt="随堂小测插画">
           <p class="eyebrow">课堂挑战</p>
           <h1 id="quizTitle">随堂小测</h1>
           <p id="enemyDescription">请观察题型与敌人意图。</p>
           <div class="enemy-statuses"><span id="enemyThought" hidden>思路 <b>0</b></span><span id="enemyBlock" hidden>防御 <b>0</b></span></div>
-          <div class="enemy-hp-row"><span>测验进度</span><div class="status-bar enemy"><i id="quizHpBar"></i></div><b id="quizHpText">52 / 52</b></div>
+          <div class="enemy-hp-row"><span id="quizHpLabel">测验进度</span><div class="status-bar enemy"><i id="quizHpBar"></i></div><b id="quizHpText">52 / 52</b></div>
+          <div id="examSubmitPanel" class="exam-submit-panel" hidden><p>已完成 <b id="examProgress">0%</b> · 当前压力 <b id="examPressure">+0</b></p><p id="examSubmitHint">完成40%后可交卷。</p><button id="examSubmitButton" class="exam-submit-button" type="button" disabled>交卷</button></div>
         </article>
         <div id="battleFloat" class="battle-float" aria-live="polite"></div>
         <p id="battleLog" class="battle-log">试卷已经发下，先观察题型。</p>
@@ -248,11 +298,24 @@
     </section>
   </main>
 
+  <div id="grade1ChoiceModal" class="modal" hidden>
+    <section class="modal-card grade1-choice-card" role="dialog" aria-modal="true" aria-labelledby="grade1ChoiceTitle">
+      <p class="eyebrow">高一专属圣遗物</p>
+      <h2 id="grade1ChoiceTitle">开战前选择加成</h2>
+      <div id="grade1RelicArt"></div>
+      <p>选择1项，只在本场战斗中生效。</p>
+      <div class="grade1-choice-options">
+        <button id="chooseGrade1Strength" type="button"><strong>力量 +3</strong><small>每段攻击的基础伤害增加3。</small></button>
+        <button id="chooseGrade1Dexterity" type="button"><strong>敏捷 +3</strong><small>卡牌获得防御时额外增加3。</small></button>
+      </div>
+    </section>
+  </div>
+
   <div id="finishModal" class="modal" hidden>
     <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
       <p class="eyebrow">第一层路线完成</p><h2 id="finishTitle">抵达期末节点</h2>
       <p id="finishSummary">你完成了本层期末考试。</p>
-      <button id="restartMap" class="primary-button" type="button">返回主界面</button>
+      <button id="restartMap" class="primary-button" type="button">进入高二</button>
     </section>
   </div>
 
@@ -302,8 +365,10 @@
       </div>
       <section id="encyclopediaCardsPanel" role="tabpanel" aria-labelledby="encyclopediaCardsTab">
         <div class="encyclopedia-tools">
-          <label for="encyclopediaCardFilter">查看卡牌</label>
-          <select id="encyclopediaCardFilter"><option value="all">全部</option><option value="class">C部</option><option value="a">A部（待设计）</option><option value="b">B部（待设计）</option><option value="colorless">无色</option><option value="curse">厄运</option></select>
+          <label class="encyclopedia-filter" for="encyclopediaCardFilter">归属<select id="encyclopediaCardFilter"><option value="all">全部归属</option><option value="a">A部（待设计）</option><option value="b">B部（待设计）</option><option value="c">C部</option><option value="neutral">无色</option><option value="curse">厄运卡</option></select></label>
+          <label class="encyclopedia-filter" for="encyclopediaTypeFilter">类型<select id="encyclopediaTypeFilter"><option value="all">全部类型</option><option value="attack">攻击</option><option value="skill">技能</option><option value="power">天赋</option><option value="curse">厄运</option></select></label>
+          <label class="encyclopedia-filter" for="encyclopediaRarityFilter">稀有度<select id="encyclopediaRarityFilter"><option value="all">全部稀有度</option><option value="basic">基础</option><option value="common">普通</option><option value="uncommon">罕见</option><option value="rare">稀有</option><option value="curse">厄运（无稀有度）</option></select></label>
+          <button id="encyclopediaReset" class="preview-toggle" type="button">重置筛选</button>
           <button id="encyclopediaUpgrade" class="preview-toggle" type="button" aria-pressed="false">显示升级后效果</button>
         </div>
         <p id="encyclopediaCardCount" class="encyclopedia-count"></p>
@@ -343,6 +408,7 @@
     </section>
   </div>
   <div id="statusTooltip" class="status-tooltip" role="tooltip" hidden><strong id="statusTooltipTitle"></strong><p id="statusTooltipText"></p></div>
+  <button id="debugReturnMap" class="debug-return-map" type="button" hidden>调试 · 返回地图 / 换层</button>
   <script src="./app.js"></script>
 </body>
 </html>
